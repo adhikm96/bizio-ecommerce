@@ -3,7 +3,9 @@ package model
 type Order struct {
 	BaseEntity
 	UserID         uint    `json:"user_id" gorm:"index:idx_orders_user_id"`
+	User           User    `gorm:"foreignKey:user_id"`
 	AddressID      uint    `json:"address_id"`
+	Address        Address `gorm:"foreignKey:address_id"`
 	TotalAmount    float64 `json:"total_amount" gorm:"type:decimal(10, 2); not null"`
 	DiscountAmount float64 `json:"discount_amount" gorm:"type:decimal(10, 2); default:0.0"`
 	FinalAmount    float64 `json:"final_amount" gorm:"type:decimal(10, 2); not null"`
