@@ -51,6 +51,11 @@ func MigrateDBSchema() {
 		&model.Promotion{},
 		&model.Order{},
 		&model.Payment{},
+		&model.CartItem{},
+		&model.VariantAttribute{},
+		&model.OrderItem{},
+		&model.ProductPromotion{},
+		&model.Review{},
 	)
 
 	if err != nil {
