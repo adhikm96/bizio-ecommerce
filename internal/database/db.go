@@ -34,7 +34,7 @@ func NewDatabaseConnection() *gorm.DB {
 
 func MigrateDBSchema() {
 	db = NewDatabaseConnection()
-	err := db.AutoMigrate(&model.User{})
+	err := db.AutoMigrate(&model.User{}, &model.Address{}, &model.Cart{}, &model.Promotion{}, &model.Order{}, &model.Payment{})
 
 	if err != nil {
 		slog.Error(err.Error())
