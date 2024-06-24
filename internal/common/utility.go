@@ -2,7 +2,7 @@ package common
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -11,16 +11,6 @@ func Ternary(condition bool, valueIfTrue, valueIfFalse interface{}) interface{} 
 		return valueIfTrue
 	}
 	return valueIfFalse
-}
-
-func FailOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
-	}
-}
-
-func LogError(err string) {
-	log.Println(err)
 }
 
 func HandleErrorRes(writer http.ResponseWriter, errMap map[string]string) {
@@ -46,7 +36,7 @@ func SendOkRes(writer http.ResponseWriter, errMap map[string]string) {
 func ReadReqPayload(writer http.ResponseWriter, request *http.Request, payload interface{}) bool {
 	err := json.NewDecoder(request.Body).Decode(payload)
 	if err != nil {
-		LogError(err.Error())
+		slog.Error(err.Error())
 		writer.WriteHeader(http.StatusBadRequest)
 		return false
 	}
