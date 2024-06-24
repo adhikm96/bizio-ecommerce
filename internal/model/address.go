@@ -3,6 +3,7 @@ package model
 type Address struct {
 	BaseEntity
 	UserID       uint   `json:"user_id"`
+	User         User   `gorm:"constraint:OnDelete:CASCADE"`
 	AddressLine1 string `json:"address_line1" gorm:"type:varchar(255); not null"`
 	AddressLine2 string `json:"address_line2" gorm:"type:varchar(255)"`
 	City         string `json:"city" gorm:"type:varchar(100); not null"`
