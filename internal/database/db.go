@@ -35,10 +35,27 @@ func NewDatabaseConnection() *gorm.DB {
 
 func MigrateDBSchema() {
 	db = NewDatabaseConnection()
-	err := db.AutoMigrate(&model.User{}, &model.Category{}, &model.Brand{}, &model.Product{}, &model.ProductVariant{}, &model.Inventory{}, &model.Address{}, &model.Cart{}, &model.Promotion{}, &model.Order{}, &model.Payment{})
+	err := db.AutoMigrate(
+		&model.User{},
+		&model.Notification{},
+		&model.Attribute{},
+		&model.AttributeValue{},
+		&model.Discount{},
+		&model.Category{},
+		&model.Brand{},
+		&model.Product{},
+		&model.ProductVariant{},
+		&model.Inventory{},
+		&model.Address{},
+		&model.Cart{},
+		&model.Promotion{},
+		&model.Order{},
+		&model.Payment{},
+	)
 
 	if err != nil {
 		slog.Error(err.Error())
+		panic(err.Error())
 	}
 
 	slog.Info("DB migrated")
