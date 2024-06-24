@@ -39,6 +39,7 @@ func MigrateDBSchema() {
 		&model.User{},
 		&model.Notification{},
 		&model.Attribute{},
+		&model.AttributeValue{},
 		&model.Discount{},
 		&model.Category{},
 		&model.Brand{},
