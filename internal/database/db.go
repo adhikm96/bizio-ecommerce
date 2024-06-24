@@ -1,10 +1,10 @@
 package database
 
 import (
+	"log/slog"
 	"os"
 	"strconv"
 
-	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -26,7 +26,9 @@ func NewDatabaseConnection() *gorm.DB {
 	maxOpenConn, _ := strconv.Atoi(os.Getenv("DB_POOL_MAX_SIZE"))
 	sqlDB.SetMaxOpenConns(maxOpenConn)
 
-	common.FailOnError(err, "Failed to connect to DB via gorm")
+	if err != nil {
+		slog.Error(err.Error())
+	}
 
 	return db
 }
@@ -34,5 +36,10 @@ func NewDatabaseConnection() *gorm.DB {
 func MigrateDBSchema() {
 	db = NewDatabaseConnection()
 	err := db.AutoMigrate(&model.User{}, &model.Category{}, &model.Brand{}, &model.Product{}, &model.ProductVariant{}, &model.Inventory{})
-	common.FailOnError(err, "Failed to migrate")
+
+	if err != nil {
+		slog.Error(err.Error())
+	}
+
+	slog.Info("DB migrated")
 }

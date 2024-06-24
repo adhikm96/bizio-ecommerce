@@ -3,7 +3,7 @@ package server
 import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -15,6 +15,10 @@ func InitServer() {
 func StartServer() {
 	http.HandleFunc("/ping", handler.PingHandler)
 
-	log.Println("server started at :8000")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	slog.Info("starting server at :8000")
+
+	err := http.ListenAndServe(":8000", nil)
+	if err != nil {
+		slog.Error(err.Error())
+	}
 }
