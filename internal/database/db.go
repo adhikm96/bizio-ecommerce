@@ -1,12 +1,13 @@
 package database
 
 import (
-	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log/slog"
 	"os"
 	"strconv"
+
+	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var db *gorm.DB
@@ -39,6 +40,16 @@ func MigrateDBSchema() {
 		&model.Notification{},
 		&model.Attribute{},
 		&model.Discount{},
+		&model.Category{},
+		&model.Brand{},
+		&model.Product{},
+		&model.ProductVariant{},
+		&model.Inventory{},
+		&model.Address{},
+		&model.Cart{},
+		&model.Promotion{},
+		&model.Order{},
+		&model.Payment{},
 	)
 
 	if err != nil {
