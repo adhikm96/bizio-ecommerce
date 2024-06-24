@@ -1,12 +1,13 @@
 package database
 
 import (
+	"os"
+	"strconv"
+
 	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
-	"strconv"
 )
 
 var db *gorm.DB
@@ -32,6 +33,6 @@ func NewDatabaseConnection() *gorm.DB {
 
 func MigrateDBSchema() {
 	db = NewDatabaseConnection()
-	err := db.AutoMigrate(&model.User{})
+	err := db.AutoMigrate(&model.User{}, &model.Category{}, &model.Brand{}, &model.Product{}, &model.ProductVariant{}, &model.Inventory{})
 	common.FailOnError(err, "Failed to migrate")
 }
