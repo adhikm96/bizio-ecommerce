@@ -20,7 +20,7 @@ func GetHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	notification := service.Fetch(uint(nID))
+	notification := service.FetchNotification(uint(nID))
 
 	if notification.ID == 0 {
 		common.HandleErrorRes(writer, map[string]string{"message": "notification does not exists with given id"})

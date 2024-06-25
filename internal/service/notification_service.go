@@ -12,7 +12,7 @@ func FetchUserNotifications(userId uint) []*common.NotificationListDto {
 	return notifications
 }
 
-func Fetch(nId uint) *common.NotificationListDto {
+func FetchNotification(nId uint) *common.NotificationListDto {
 	db := database.NewDatabaseConnection()
 	var notification common.NotificationListDto
 	db.Raw("SELECT id, user_id, notification_type, message, status FROM notifications WHERE id = ?", nId).Scan(&notification)
