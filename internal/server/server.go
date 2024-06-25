@@ -18,9 +18,9 @@ func StartServer() {
 	http.HandleFunc("/api/v1/ping", handler.PingHandler)
 
 	// notification api
-	http.Handle("POST /api/v1/notifications/{user_id}", JSONHeaderMiddleware(http.HandlerFunc(notification.CreateHandler)))
+	http.Handle("POST /api/v1/notifications", JSONHeaderMiddleware(http.HandlerFunc(notification.CreateHandler)))
 	http.Handle("GET /api/v1/notifications/{user_id}", JSONHeaderMiddleware(http.HandlerFunc(notification.UsersNotificationHandler)))
-	http.Handle("GET /api/v1/notifications/{id}/read", JSONHeaderMiddleware(http.HandlerFunc(notification.GetHandler)))
+	http.Handle("PUT /api/v1/notifications/{id}/read", JSONHeaderMiddleware(http.HandlerFunc(notification.UpdateReadNotification)))
 
 	slog.Info("starting server at :8000")
 

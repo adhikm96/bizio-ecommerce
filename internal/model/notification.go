@@ -3,8 +3,8 @@ package model
 type NotificationStatus int
 
 const (
-	READ_NOTIFICATION NotificationStatus = iota
-	UNREAD_NOTIFICATION
+	UNREAD_NOTIFICATION NotificationStatus = iota
+	READ_NOTIFICATION
 )
 
 type Notification struct {

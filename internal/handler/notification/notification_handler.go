@@ -3,15 +3,13 @@ package notification
 import (
 	"encoding/json"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
-	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
-	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/service"
 	"log/slog"
 	"net/http"
 	"strconv"
 )
 
-func GetHandler(writer http.ResponseWriter, request *http.Request) {
+func UpdateReadNotification(writer http.ResponseWriter, request *http.Request) {
 	nID, err := strconv.Atoi(request.PathValue("id"))
 
 	if err != nil {
@@ -20,18 +18,10 @@ func GetHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	notification := service.FetchNotification(uint(nID))
-
-	if notification.ID == 0 {
-		common.HandleErrorRes(writer, map[string]string{"message": "notification does not exists with given id"})
-		return
-	}
-
-	err = json.NewEncoder(writer).Encode(notification)
+	err = service.UpdateNotificationAsRead(uint(nID))
 
 	if err != nil {
-		slog.Error(err.Error())
-		common.HandleErrorRes(writer, map[string]string{"message": "failed to fetch user's notifications"})
+		common.HandleErrorRes(writer, map[string]string{"message": err.Error()})
 	}
 }
 
@@ -63,15 +53,7 @@ func UsersNotificationHandler(writer http.ResponseWriter, request *http.Request)
 }
 
 func CreateHandler(writer http.ResponseWriter, request *http.Request) {
-
 	notificationCreateDto := common.NotificationCreateDto{}
-	userId, err := strconv.Atoi(request.PathValue("user_id"))
-
-	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		slog.Debug("cannot read user_id from " + request.PathValue("user_id"))
-		return
-	}
 
 	// fetch body
 	if ok := common.ReadReqPayload(writer, request, &notificationCreateDto); !ok {
@@ -84,20 +66,9 @@ func CreateHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	// create
-	notification := model.Notification{
-		UserID:           uint(userId),
-		NotificationType: notificationCreateDto.NotificationType,
-		Message:          notificationCreateDto.Message,
-		Status:           model.UNREAD_NOTIFICATION,
-	}
+	notification, err := service.CreateNotification(notificationCreateDto)
 
-	db := database.NewDatabaseConnection()
-
-	res := db.Create(&notification)
-
-	if res.Error != nil {
-		slog.Error(err.Error())
+	if err != nil {
 		common.HandleErrorRes(writer, map[string]string{"message": "failed to create notification"})
 		return
 	}
@@ -109,6 +80,11 @@ func CreateHandler(writer http.ResponseWriter, request *http.Request) {
 func validateNotificationCreate(dto common.NotificationCreateDto) map[string]string {
 
 	errMap := make(map[string]string)
+
+	// check user exists
+	if !service.CheckUserExists(dto.UserId) {
+		errMap["user_id"] = "does not exists"
+	}
 
 	// check type
 	if dto.NotificationType == "" {

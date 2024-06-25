@@ -37,18 +37,19 @@ func TestNotificationApi(t *testing.T) {
 	notiCreateDto := common.NotificationCreateDto{
 		NotificationType: "EMAIL",
 		Message:          "Sample Email",
+		UserId:           user1.ID,
 	}
 
 	payload, err := json.Marshal(notiCreateDto)
 
-	_, response, _ := testutil.MakeReq("POST", "/notifications/"+strconv.Itoa(int(user1.ID)), []byte(""), nil)
+	_, response, _ := testutil.MakeReq("POST", "/notifications", []byte(""), nil)
 
 	if response.StatusCode != 400 {
 		t.Fail()
 		return
 	}
 
-	resPayload, _, err := testutil.MakeReq("POST", "/notifications/"+strconv.Itoa(int(user1.ID)), payload, nil)
+	resPayload, _, err := testutil.MakeReq("POST", "/notifications", payload, nil)
 
 	if err != nil {
 		slog.Error(err.Error())
@@ -69,44 +70,37 @@ func TestNotificationApi(t *testing.T) {
 
 	nId, _ := strconv.Atoi(resBody["notification_id"])
 
+	// check status of notification
+	notification := model.Notification{}
+	db.Find(&notification, "id = ?", nId)
+
+	if notification.Status != model.UNREAD_NOTIFICATION {
+		t.Fail()
+		return
+	}
+
 	// get notification api
 
-	_, response, _ = testutil.MakeReq("GET", "/notifications/0/read", []byte(""), nil)
+	_, response, _ = testutil.MakeReq("PUT", "/notifications/0/read", []byte(""), nil)
 
 	if response.StatusCode != 400 {
 		t.Fail()
 		return
 	}
 
-	resPayload, _, err = testutil.MakeReq("GET", "/notifications/"+strconv.Itoa(nId)+"/read", []byte(""), nil)
+	_, _, err = testutil.MakeReq("PUT", "/notifications/"+strconv.Itoa(nId)+"/read", []byte(""), nil)
 
 	if err != nil {
 		slog.Error(err.Error())
 		t.Fail()
 		return
 	}
-	slog.Info(string(resPayload))
 
-	resBody2 := common.NotificationListDto{}
+	// check status of notification
+	notification = model.Notification{}
+	db.Find(&notification, "id = ?", nId)
 
-	err = json.Unmarshal(resPayload, &resBody2)
-	if err != nil {
-		slog.Error(err.Error())
-		t.Fail()
-		return
-	}
-
-	if resBody2.NotificationType != notiCreateDto.NotificationType {
-		t.Fail()
-		return
-	}
-
-	if resBody2.Message != notiCreateDto.Message {
-		t.Fail()
-		return
-	}
-
-	if resBody2.UserID != user1.ID {
+	if notification.Status != model.READ_NOTIFICATION {
 		t.Fail()
 		return
 	}
@@ -143,17 +137,22 @@ func TestNotificationApi(t *testing.T) {
 		return
 	}
 
-	if resBody3[0].NotificationType != notiCreateDto.NotificationType {
+	if resBody3[0].NotificationType != notification.NotificationType {
 		t.Fail()
 		return
 	}
 
-	if resBody3[0].Message != notiCreateDto.Message {
+	if resBody3[0].Message != notification.Message {
 		t.Fail()
 		return
 	}
 
 	if resBody3[0].UserID != user1.ID {
+		t.Fail()
+		return
+	}
+
+	if resBody3[0].Status != notification.Status {
 		t.Fail()
 		return
 	}

@@ -3,6 +3,7 @@ package common
 import "github.com/Digital-AIR/bizio-ecommerce/internal/model"
 
 type NotificationCreateDto struct {
+	UserId           uint   `json:"user_id"`
 	NotificationType string `json:"notification_type"`
 	Message          string `json:"message"`
 }
