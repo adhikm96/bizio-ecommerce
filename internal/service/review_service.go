@@ -6,15 +6,6 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 )
 
-func CheckUserExists(userId uint) bool {
-	db := database.NewDatabaseConnection()
-	var user model.User
-	if err := db.First(&user, userId).Error; err != nil {
-		return false
-	}
-	return true
-}
-
 func CheckSameUserIdAndProductIdExists(userId uint, productId uint) bool {
 	db := database.NewDatabaseConnection()
 	var exists bool

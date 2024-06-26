@@ -6,7 +6,7 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/server"
-	testutil "github.com/Digital-AIR/bizio-ecommerce/internal/test/util"
+	testutil "github.com/Digital-AIR/bizio-ecommerce/test/util"
 	"github.com/stretchr/testify/assert"
 	"log/slog"
 	"net/http"
