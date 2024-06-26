@@ -36,13 +36,21 @@ func CreateReviewHanlder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//rating check
 	if reviewCreateDto.Rating < 1 || reviewCreateDto.Rating > 5 {
 		common.HandleErrorRes(w, map[string]string{"message": "rating must be between 1 and 5"})
 		return
 	}
 
+	//check same userId and productId
 	if service.CheckSameUserIdAndProductIdExists(reviewCreateDto.UserID, uint(productId)) {
 		common.HandleErrorRes(w, map[string]string{"message": "user has already reviewed product"})
+		return
+	}
+
+	//validation check
+	if errMap := validationReviewCreate(reviewCreateDto); len(errMap) > 0 {
+		common.HandleErrorRes(w, errMap)
 		return
 	}
 
@@ -54,6 +62,16 @@ func CreateReviewHanlder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	common.SendOkRes(w, map[string]string{"id": strconv.Itoa(int(review.ID)), "rating": strconv.Itoa(int(review.Rating)), "comment": review.Comment})
+}
+
+func validationReviewCreate(dto common.ReviewCreateDto) map[string]string {
+	errMap := make(map[string]string)
+
+	if dto.Comment == "" {
+		errMap["message"] = "comment is required"
+	}
+
+	return errMap
 }
 
 func FetchReviewHandler(w http.ResponseWriter, r *http.Request) {

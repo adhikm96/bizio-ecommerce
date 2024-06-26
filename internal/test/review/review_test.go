@@ -28,7 +28,9 @@ func TestCreateValidReview(t *testing.T) {
 	db.Create(&brand)
 
 	user := model.User{Username: testutil.RandomString(5), Email: testutil.RandomString(5) + "@example.com", PasswordHash: "password"}
+	user1 := model.User{Username: testutil.RandomString(5), Email: testutil.RandomString(5) + "@example1.com", PasswordHash: "password1"}
 	db.Create(&user)
+	db.Create(&user1)
 
 	product := model.Product{Name: "testproduct", Description: "test description", CategoryID: category.ID, BrandID: brand.ID}
 	db.Create(&product)
@@ -93,6 +95,25 @@ func TestCreateValidReview(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	assert.Contains(t, strings.ToLower(string(resPayload)), "rating must be between 1 and 5")
+	slog.Info(string(resPayload))
+
+	// Review without comment
+	reviewCreateDto = common.ReviewCreateDto{
+		UserID:  user1.ID,
+		Rating:  3,
+		Comment: "",
+	}
+	payload2, err := json.Marshal(reviewCreateDto)
+
+	resPayload, resp, err = testutil.MakeReq("POST", "/products/"+strconv.Itoa(int(product.ID))+"/reviews", payload2, nil)
+	if resp.StatusCode != 400 {
+		slog.Error(err.Error())
+		t.Fail()
+		return
+	}
+
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	assert.Contains(t, string(resPayload), "comment is required")
 	slog.Info(string(resPayload))
 
 	//get product reviews api
