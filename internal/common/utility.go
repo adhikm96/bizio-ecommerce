@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strconv"
 )
 
 func Ternary(condition bool, valueIfTrue, valueIfFalse interface{}) interface{} {
@@ -41,4 +42,15 @@ func ReadReqPayload(writer http.ResponseWriter, request *http.Request, payload i
 		return false
 	}
 	return true
+}
+
+func FetchPathVariable(writer http.ResponseWriter, request *http.Request, pathVariable string) (int, error) {
+	variable, err := strconv.Atoi(request.PathValue(pathVariable))
+
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		slog.Debug("cannot read " + pathVariable + " from " + request.PathValue(pathVariable))
+	}
+
+	return variable, nil
 }
