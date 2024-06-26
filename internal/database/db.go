@@ -1,9 +1,12 @@
 package database
 
 import (
+	"gorm.io/gorm/logger"
+	"log"
 	"log/slog"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 	"gorm.io/driver/postgres"
@@ -19,7 +22,18 @@ func NewDatabaseConnection() *gorm.DB {
 
 	dbUrl := "postgresql://" + os.Getenv("DB_USERNAME") + ":" + os.Getenv("DB_PASSWORD") + "@" + os.Getenv("DB_HOST") + ":" + os.Getenv("DB_PORT") + "/" + os.Getenv("DB_NAME")
 
-	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold:             time.Second, // Slow SQL threshold
+				LogLevel:                  logger.Info, // Log level
+				IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+				ParameterizedQueries:      true,        // Don't include params in the SQL log
+				Colorful:                  false,       // Disable color
+			},
+		),
+	})
 
 	sqlDB, _ := db.DB()
 
