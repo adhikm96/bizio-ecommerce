@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/Digital-AIR/bizio-ecommerce/internal/server"
 	"io"
 	"math/rand"
 	"net/http"
+	"time"
 )
 
 func RandomString(n int) string {
@@ -63,4 +65,9 @@ func getResp(client *http.Client, request *http.Request) ([]byte, *http.Response
 	}
 
 	return data, resp, nil
+}
+
+func StartServer() {
+	go server.InitServer()
+	time.Sleep(time.Second * 3)
 }

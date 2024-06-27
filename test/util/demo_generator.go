@@ -6,14 +6,12 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-var DB = database.NewDatabaseConnection()
-
 func GetBrand() (*model.Brand, error) {
 	brand := model.Brand{
 		Name:        RandomString(10),
 		Description: "",
 	}
-	res := DB.Create(brand)
+	res := database.NewDatabaseConnection().Create(&brand)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -25,7 +23,7 @@ func GetCategory() (*model.Category, error) {
 		Name:        RandomString(10),
 		Description: "",
 	}
-	res := DB.Create(category)
+	res := database.NewDatabaseConnection().Create(&category)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -45,7 +43,7 @@ func GetVariant() (*model.ProductVariant, error) {
 		Price:     decimal.Decimal{},
 		ProductID: product.ID,
 	}
-	res := DB.Create(variant)
+	res := database.NewDatabaseConnection().Create(&variant)
 
 	if res.Error != nil {
 		return nil, res.Error
@@ -58,7 +56,7 @@ func GetAttribute() (*model.Attribute, error) {
 		Name: "attribute1",
 	}
 
-	res := DB.Create(attr)
+	res := database.NewDatabaseConnection().Create(&attr)
 
 	if res.Error != nil {
 		return nil, res.Error
@@ -86,7 +84,7 @@ func GetProduct() (*model.Product, error) {
 		CategoryID:  cat.ID,
 		BrandID:     brand.ID,
 	}
-	res := DB.Create(product)
+	res := database.NewDatabaseConnection().Create(&product)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -106,7 +104,7 @@ func GetInventory() (*model.Inventory, error) {
 		VariantID:    variant.ID,
 	}
 
-	res := DB.Create(&inventory)
+	res := database.NewDatabaseConnection().Create(&inventory)
 
 	if res.Error != nil {
 		return nil, res.Error

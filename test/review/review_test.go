@@ -5,7 +5,6 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
-	"github.com/Digital-AIR/bizio-ecommerce/internal/server"
 	testutil "github.com/Digital-AIR/bizio-ecommerce/test/util"
 	"github.com/stretchr/testify/assert"
 	"log/slog"
@@ -13,12 +12,19 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestCreateValidReview(t *testing.T) {
+	terminate, err := testutil.SetUpTestContainers()
 
-	startServer()
+	defer terminate()
+
+	if err != nil {
+		t.Fail()
+		return
+	}
+	testutil.StartServer()
+
 	db := database.NewDatabaseConnection()
 
 	category := model.Category{Name: "testcategory", Description: "test category description"}
@@ -144,9 +150,4 @@ func TestCreateValidReview(t *testing.T) {
 	}
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	assert.Contains(t, string(resPayload), "")
-}
-
-func startServer() {
-	go server.InitServer()
-	time.Sleep(time.Second * 1)
 }

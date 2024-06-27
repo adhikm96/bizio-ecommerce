@@ -5,17 +5,20 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
-	"github.com/Digital-AIR/bizio-ecommerce/internal/server"
 	testutil "github.com/Digital-AIR/bizio-ecommerce/test/util"
+	"github.com/stretchr/testify/assert"
 	"log/slog"
 	"strconv"
 	"testing"
-	"time"
 )
 
-func TestNotificationApi(t *testing.T) {
+func TestNotificationsHandler(t *testing.T) {
+	terminate, err := testutil.SetUpTestContainers()
 
-	startServer()
+	defer terminate()
+	assert.Nil(t, err)
+
+	testutil.StartServer()
 
 	user1 := model.User{
 		Username:     testutil.RandomString(5),
@@ -29,10 +32,7 @@ func TestNotificationApi(t *testing.T) {
 
 	res := db.Create(&user1)
 
-	if res.Error != nil {
-		t.Fail()
-		return
-	}
+	assert.Nil(t, res.Error)
 
 	notiCreateDto := common.NotificationCreateDto{
 		NotificationType: "EMAIL",
@@ -44,29 +44,18 @@ func TestNotificationApi(t *testing.T) {
 
 	_, response, _ := testutil.MakeReq("POST", "/notifications", []byte(""), nil)
 
-	if response.StatusCode != 400 {
-		t.Fail()
-		return
-	}
+	assert.Equal(t, response.StatusCode, 400)
 
 	resPayload, _, err := testutil.MakeReq("POST", "/notifications", payload, nil)
 
-	if err != nil {
-		slog.Error(err.Error())
-		t.Fail()
-		return
-	}
+	assert.Nil(t, err)
 
 	slog.Info(string(resPayload))
 
 	resBody := make(map[string]string)
 
 	err = json.Unmarshal(resPayload, &resBody)
-	if err != nil {
-		slog.Error(err.Error())
-		t.Fail()
-		return
-	}
+	assert.Nil(t, err)
 
 	nId, _ := strconv.Atoi(resBody["notification_id"])
 
@@ -74,91 +63,42 @@ func TestNotificationApi(t *testing.T) {
 	notification := model.Notification{}
 	db.Find(&notification, "id = ?", nId)
 
-	if notification.Status != model.UNREAD_NOTIFICATION {
-		t.Fail()
-		return
-	}
+	assert.Equal(t, notification.Status, model.UNREAD_NOTIFICATION)
 
 	// get notification api
-
 	_, response, _ = testutil.MakeReq("PUT", "/notifications/0/read", []byte(""), nil)
 
-	if response.StatusCode != 400 {
-		t.Fail()
-		return
-	}
+	assert.Equal(t, response.StatusCode, 400)
 
 	_, _, err = testutil.MakeReq("PUT", "/notifications/"+strconv.Itoa(nId)+"/read", []byte(""), nil)
 
-	if err != nil {
-		slog.Error(err.Error())
-		t.Fail()
-		return
-	}
+	assert.Nil(t, err)
 
 	// check status of notification
 	notification = model.Notification{}
 	db.Find(&notification, "id = ?", nId)
 
-	if notification.Status != model.READ_NOTIFICATION {
-		t.Fail()
-		return
-	}
+	assert.Equal(t, notification.Status, model.READ_NOTIFICATION)
 
 	// get user's notification api
 	_, response, _ = testutil.MakeReq("GET", "/notifications/0", []byte(""), nil)
 
-	if response.StatusCode != 400 {
-		t.Fail()
-		return
-	}
+	assert.Equal(t, response.StatusCode, 400)
 
 	resPayload, _, err = testutil.MakeReq("GET", "/notifications/"+strconv.Itoa(int(user1.ID)), []byte(""), nil)
 
-	if err != nil {
-		slog.Error(err.Error())
-		t.Fail()
-		return
-	}
+	assert.Nil(t, err)
 
 	var resBody3 []common.NotificationListDto
 
 	slog.Info(string(resPayload))
 
 	err = json.Unmarshal(resPayload, &resBody3)
-	if err != nil {
-		slog.Error(err.Error())
-		t.Fail()
-		return
-	}
+	assert.Nil(t, err)
 
-	if len(resBody3) != 1 {
-		t.Fail()
-		return
-	}
-
-	if resBody3[0].NotificationType != notification.NotificationType {
-		t.Fail()
-		return
-	}
-
-	if resBody3[0].Message != notification.Message {
-		t.Fail()
-		return
-	}
-
-	if resBody3[0].UserID != user1.ID {
-		t.Fail()
-		return
-	}
-
-	if resBody3[0].Status != notification.Status {
-		t.Fail()
-		return
-	}
-}
-
-func startServer() {
-	go server.InitServer()
-	time.Sleep(time.Second * 1)
+	assert.Equal(t, len(resBody3), 1)
+	assert.Equal(t, resBody3[0].NotificationType, notification.NotificationType)
+	assert.Equal(t, resBody3[0].Message, notification.Message)
+	assert.Equal(t, resBody3[0].UserID, notification.UserID)
+	assert.Equal(t, resBody3[0].Status, notification.Status)
 }
