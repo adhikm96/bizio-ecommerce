@@ -1,4 +1,4 @@
-package notification
+package test
 
 import (
 	"encoding/json"
@@ -13,13 +13,6 @@ import (
 )
 
 func TestNotificationsHandler(t *testing.T) {
-	terminate, err := testutil.SetUpTestContainers()
-
-	defer terminate()
-	assert.Nil(t, err)
-
-	testutil.StartServer()
-
 	user1 := model.User{
 		Username:     testutil.RandomString(5),
 		Email:        testutil.RandomString(5) + "@example.com",
@@ -101,4 +94,5 @@ func TestNotificationsHandler(t *testing.T) {
 	assert.Equal(t, resBody3[0].Message, notification.Message)
 	assert.Equal(t, resBody3[0].UserID, notification.UserID)
 	assert.Equal(t, resBody3[0].Status, notification.Status)
+
 }

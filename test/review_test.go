@@ -1,4 +1,4 @@
-package review
+package test
 
 import (
 	"encoding/json"
@@ -15,16 +15,6 @@ import (
 )
 
 func TestCreateValidReview(t *testing.T) {
-	terminate, err := testutil.SetUpTestContainers()
-
-	defer terminate()
-
-	if err != nil {
-		t.Fail()
-		return
-	}
-	testutil.StartServer()
-
 	db := database.NewDatabaseConnection()
 
 	category := model.Category{Name: "testcategory", Description: "test category description"}
@@ -150,4 +140,5 @@ func TestCreateValidReview(t *testing.T) {
 	}
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	assert.Contains(t, string(resPayload), "")
+
 }

@@ -1,4 +1,4 @@
-package inventory
+package test
 
 import (
 	"encoding/json"
@@ -12,14 +12,6 @@ import (
 )
 
 func TestInventoryFlow(t *testing.T) {
-
-	terminate, err := test_util.SetUpTestContainers()
-	defer terminate()
-
-	assert.Nil(t, err)
-
-	test_util.StartServer()
-
 	inventory, err := test_util.GetInventory()
 
 	// test get api
@@ -70,4 +62,5 @@ func TestInventoryFlow(t *testing.T) {
 
 	assert.Equal(t, inventory.Quantity, invUpdateDto.Quantity)
 	assert.Equal(t, inventory.ReorderLevel, invUpdateDto.ReorderLevel)
+
 }

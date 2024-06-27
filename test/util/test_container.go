@@ -12,8 +12,19 @@ import (
 	"time"
 )
 
-func SetUpTestContainers() (func(), error) {
-	ctx := context.Background()
+var postgresContainer *postgres.PostgresContainer = nil
+
+func Terminate(ctx context.Context) {
+	if err := postgresContainer.Terminate(ctx); err != nil {
+		log.Fatalf("failed to terminate container: %s", err)
+	}
+}
+
+func SetUpTestContainers(ctx context.Context) {
+
+	if postgresContainer != nil {
+		return
+	}
 
 	slog.Info("setting up test-containers")
 
@@ -21,7 +32,7 @@ func SetUpTestContainers() (func(), error) {
 	dbUser := "postgres"
 	dbPassword := "postgres"
 
-	postgresContainer, err := postgres.RunContainer(ctx,
+	postgresContainer2, err := postgres.RunContainer(ctx,
 		testcontainers.WithImage("docker.io/postgres:16-alpine"),
 		//postgres.WithInitScripts(filepath.Join("testdata", "init-user-db.sh")),
 		//postgres.WithConfigFile(filepath.Join("testdata", "my-postgres.conf")),
@@ -34,6 +45,8 @@ func SetUpTestContainers() (func(), error) {
 				WithStartupTimeout(5*time.Second)),
 	)
 
+	postgresContainer = postgresContainer2
+
 	if err != nil {
 		panic(err.Error())
 	}
@@ -45,7 +58,7 @@ func SetUpTestContainers() (func(), error) {
 	port, err := postgresContainer.MappedPort(ctx, "5432")
 
 	if err != nil {
-		return nil, err
+		panic(err.Error())
 	}
 
 	config.Config["DB_PORT"] = strings.Split(string(port), "/")[0]
@@ -59,13 +72,6 @@ func SetUpTestContainers() (func(), error) {
 
 	if err != nil {
 		slog.Error("failed to start container: " + err.Error())
-		return nil, err
+		panic(err.Error())
 	}
-
-	// Clean up the container
-	return func() {
-		if err := postgresContainer.Terminate(ctx); err != nil {
-			log.Fatalf("failed to terminate container: %s", err)
-		}
-	}, nil
 }
