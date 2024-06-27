@@ -6,11 +6,12 @@ import (
 )
 
 var Config = map[string]string{
-	"DB_NAME":     os.Getenv("DB_NAME"),
-	"DB_USERNAME": os.Getenv("DB_USERNAME"),
-	"DB_PASSWORD": os.Getenv("DB_PASSWORD"),
-	"DB_PORT":     os.Getenv("DB_PORT"),
-	"DB_HOST":     os.Getenv("DB_HOST"),
+	"DB_NAME":          os.Getenv("DB_NAME"),
+	"DB_USERNAME":      os.Getenv("DB_USERNAME"),
+	"DB_PASSWORD":      os.Getenv("DB_PASSWORD"),
+	"DB_PORT":          os.Getenv("DB_PORT"),
+	"DB_HOST":          os.Getenv("DB_HOST"),
+	"DB_POOL_MAX_SIZE": os.Getenv("DB_POOL_MAX_SIZE"),
 }
 
 func Get(key string) string {
