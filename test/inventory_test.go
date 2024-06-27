@@ -14,9 +14,12 @@ import (
 func TestInventoryFlow(t *testing.T) {
 	inventory, err := test_util.GetInventory()
 
-	// test get api
+	_, response, _ := test_util.MakeReq("GET", "/inventory/0", []byte(""), nil)
 
-	resPayload, _, err := test_util.MakeReq("GET", "/inventory/"+strconv.Itoa(int(inventory.ID)), []byte(""), nil)
+	assert.Equal(t, response.StatusCode, 400)
+
+	// test get api
+	resPayload, _, err := test_util.MakeReq("GET", "/inventory/"+strconv.Itoa(int(inventory.VariantID)), []byte(""), nil)
 
 	assert.Nil(t, err)
 
@@ -33,7 +36,6 @@ func TestInventoryFlow(t *testing.T) {
 	assert.Equal(t, inventory.ID, inventoryDetail.Id)
 
 	// update test
-
 	invUpdateDto := common.InventoryUpdateDto{
 		Quantity:     0,
 		ReorderLevel: 0,
@@ -42,8 +44,10 @@ func TestInventoryFlow(t *testing.T) {
 	data, err := json.Marshal(invUpdateDto)
 	assert.Nil(t, err)
 
-	_, response, err := test_util.MakeReq("PUT", "/admin/inventory/"+strconv.Itoa(int(inventory.ID)), data, nil)
+	_, response, err = test_util.MakeReq("PUT", "/admin/inventory/0", data, nil)
+	assert.Equal(t, response.StatusCode, 400)
 
+	_, response, err = test_util.MakeReq("PUT", "/admin/inventory/"+strconv.Itoa(int(inventory.VariantID)), data, nil)
 	assert.Equal(t, response.StatusCode, 400)
 
 	invUpdateDto = common.InventoryUpdateDto{
@@ -54,8 +58,7 @@ func TestInventoryFlow(t *testing.T) {
 	data, err = json.Marshal(invUpdateDto)
 	assert.Nil(t, err)
 
-	_, _, err = test_util.MakeReq("PUT", "/admin/inventory/"+strconv.Itoa(int(inventory.ID)), data, nil)
-
+	_, _, err = test_util.MakeReq("PUT", "/admin/inventory/"+strconv.Itoa(int(inventory.VariantID)), data, nil)
 	assert.Nil(t, err)
 
 	database.NewDatabaseConnection().First(&inventory, "id = ?", inventory.ID)

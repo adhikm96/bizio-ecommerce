@@ -9,14 +9,19 @@ import (
 )
 
 func FetchInventoryHandler(writer http.ResponseWriter, request *http.Request) {
-	invID, err := common.FetchPathVariable(writer, request, "id")
+	variantId, err := common.FetchPathVariable(writer, request, "variantId")
 
 	if err != nil {
 		return
 	}
 
 	// fetch inventory details
-	inventory, err := service.FetchInventory(uint(invID))
+	inventory, err := service.FetchInventory(uint(variantId))
+
+	if err != nil {
+		common.HandleErrorRes(writer, map[string]string{"message": err.Error()})
+		return
+	}
 
 	err = json.NewEncoder(writer).Encode(inventory)
 	if err != nil {
@@ -26,7 +31,7 @@ func FetchInventoryHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func UpdateInventoryHandler(writer http.ResponseWriter, request *http.Request) {
-	invID, err := common.FetchPathVariable(writer, request, "id")
+	variantId, err := common.FetchPathVariable(writer, request, "variantId")
 
 	if err != nil {
 		return
@@ -45,7 +50,7 @@ func UpdateInventoryHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	err = service.UpdateInventory(uint(invID), invUpdateDto)
+	err = service.UpdateInventory(uint(variantId), invUpdateDto)
 
 	if err != nil {
 		common.HandleErrorRes(writer, map[string]string{"message": err.Error()})

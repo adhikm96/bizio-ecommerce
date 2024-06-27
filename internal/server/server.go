@@ -28,8 +28,8 @@ func StartServer() {
 	http.Handle("POST /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.CreateReviewHanlder)))
 	http.Handle("GET /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.FetchReviewHandler)))
 
-	http.Handle("GET /api/v1/inventory/{id}", JSONHeaderMiddleware(http.HandlerFunc(inventory.FetchInventoryHandler)))
-	http.Handle("PUT /api/v1/admin/inventory/{id}", JSONHeaderMiddleware(http.HandlerFunc(inventory.UpdateInventoryHandler)))
+	http.Handle("GET /api/v1/inventory/{variantId}", JSONHeaderMiddleware(http.HandlerFunc(inventory.FetchInventoryHandler)))
+	http.Handle("PUT /api/v1/admin/inventory/{variantId}", JSONHeaderMiddleware(http.HandlerFunc(inventory.UpdateInventoryHandler)))
 
 	slog.Info("starting server at :8000")
 
