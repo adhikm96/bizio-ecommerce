@@ -39,7 +39,7 @@ func GetVariant() (*model.ProductVariant, error) {
 	}
 
 	variant := model.ProductVariant{
-		Sku:       "sku 1",
+		Sku:       RandomString(10),
 		Price:     decimal.Decimal{},
 		ProductID: product.ID,
 	}

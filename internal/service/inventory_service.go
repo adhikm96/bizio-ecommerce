@@ -26,7 +26,7 @@ func UpdateInventory(variantId uint, dto common.InventoryUpdateDto) error {
 	db.Find(&inventory, "variant_id = ?", variantId)
 
 	if inventory.ID == 0 {
-		return errors.New("inventory does not exists with given variant id")
+		inventory.VariantID = variantId
 	}
 
 	inventory.Quantity = dto.Quantity

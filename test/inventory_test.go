@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
+	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 	test_util "github.com/Digital-AIR/bizio-ecommerce/test/util"
 	"github.com/stretchr/testify/assert"
 	"log/slog"
@@ -11,8 +12,41 @@ import (
 	"testing"
 )
 
+func TestNewInventoryCreate(t *testing.T) {
+
+	db := database.NewDatabaseConnection()
+
+	variant, err := test_util.GetVariant()
+	assert.Nil(t, err)
+
+	inv := model.Inventory{}
+
+	db.Raw("select * from inventories where variant_id = ?", variant.ID).Scan(&inv)
+
+	assert.Equal(t, uint(0), inv.ID)
+
+	invUpdateDto := common.InventoryUpdateDto{
+		Quantity:     1000,
+		ReorderLevel: 500,
+	}
+
+	data, err := json.Marshal(invUpdateDto)
+	assert.Nil(t, err)
+
+	_, _, err = test_util.MakeReq("PUT", "/admin/inventory/"+strconv.Itoa(int(variant.ID)), data, nil)
+	assert.Nil(t, err)
+
+	db.Raw("select * from inventories where variant_id = ?", variant.ID).Scan(&inv)
+
+	assert.NotEqual(t, uint(0), inv.ID)
+	assert.Equal(t, invUpdateDto.Quantity, inv.Quantity)
+	assert.Equal(t, invUpdateDto.ReorderLevel, inv.ReorderLevel)
+}
+
 func TestInventoryFlow(t *testing.T) {
 	inventory, err := test_util.GetInventory()
+
+	assert.Nil(t, err)
 
 	_, response, _ := test_util.MakeReq("GET", "/inventory/0", []byte(""), nil)
 
@@ -43,9 +77,6 @@ func TestInventoryFlow(t *testing.T) {
 
 	data, err := json.Marshal(invUpdateDto)
 	assert.Nil(t, err)
-
-	_, response, err = test_util.MakeReq("PUT", "/admin/inventory/0", data, nil)
-	assert.Equal(t, response.StatusCode, 400)
 
 	_, response, err = test_util.MakeReq("PUT", "/admin/inventory/"+strconv.Itoa(int(inventory.VariantID)), data, nil)
 	assert.Equal(t, response.StatusCode, 400)
