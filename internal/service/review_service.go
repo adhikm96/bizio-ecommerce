@@ -29,15 +29,6 @@ func CreateReview(reviewCreateDto common.ReviewCreateDto, productId uint) (*mode
 	return &review, db.Create(&review).Error
 }
 
-func CheckProductExists(productId uint) bool {
-	db := database.NewDatabaseConnection()
-	var product model.Product
-	if err := db.First(&product, productId).Error; err != nil {
-		return false
-	}
-	return true
-}
-
 func GetProductReview(productId uint) []*common.ReviewListDto {
 	var reviews []*common.ReviewListDto
 	db := database.NewDatabaseConnection()

@@ -28,3 +28,21 @@ type ReviewListDto struct {
 	Rating    uint   `json:"rating"`
 	Comment   string `json:"comment"`
 }
+
+type AddCartItemDto struct {
+	UserID           uint `json:"user_id"`
+	ProductVariantID uint `json:"variant_id"`
+	Quantity         int  `json:"quantity"`
+}
+
+type CartResponse struct {
+	ID        uint           `json:"id"`
+	UserID    uint           `json:"user_id"`
+	CartItems []CartItemInfo `json:"cart_items"`
+}
+
+type CartItemInfo struct {
+	CartID    uint `json:"cart_id"`
+	VariantID uint `json:"variant_id"`
+	Quantity  int  `json:"quantity"`
+}
