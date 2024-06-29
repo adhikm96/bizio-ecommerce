@@ -58,8 +58,8 @@ func validationCartItem(dto common.AddCartItemDto) map[string]string {
 	}
 
 	//check quantity
-	if dto.Quantity < 0 {
-		errors["quantity"] = "quantity cannot be negative"
+	if dto.Quantity <= 0 {
+		errors["quantity"] = "quantity cannot be zero or negative"
 	}
 
 	return errors
@@ -97,16 +97,16 @@ func FetchCartDetailsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemoveCartItemsHandler(w http.ResponseWriter, r *http.Request) {
-	cartId, err := strconv.Atoi(r.PathValue("cart_id"))
+	cartItemId, err := strconv.Atoi(r.PathValue("cart_item_id"))
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		slog.Debug("cannot read cart id from " + r.PathValue("cart_id"))
+		slog.Debug("cannot read cart item id from " + r.PathValue("cart_item_id"))
 		return
 	}
 
-	//delete cartItem by cartId
-	err = service.RemoveCartItem(uint(cartId))
+	//delete cartItem by cartItemId
+	err = service.RemoveCartItem(uint(cartItemId))
 
 	if err != nil {
 		common.HandleErrorRes(w, map[string]string{"message": err.Error()})

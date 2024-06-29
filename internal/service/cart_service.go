@@ -63,9 +63,9 @@ func FetchCartItem(userId uint) ([]common.CartResponse, error) {
 
 		for _, item := range cart.CartItems {
 			cartItem := common.CartItemInfo{
-				CartID:    item.CartID,
-				VariantID: item.ProductVariantID,
-				Quantity:  item.Quantity,
+				CartItemID: item.ID,
+				VariantID:  item.ProductVariantID,
+				Quantity:   item.Quantity,
 			}
 			cartResp.CartItems = append(cartResp.CartItems, cartItem)
 		}
@@ -75,23 +75,18 @@ func FetchCartItem(userId uint) ([]common.CartResponse, error) {
 	return cartResponses, nil
 }
 
-func RemoveCartItem(cartId uint) error {
+func RemoveCartItem(cartItemId uint) error {
 	db := database.GetDbConn()
-	var cart model.Cart
+	var cartItem model.CartItem
 
-	db.First(&cart, cartId)
+	db.First(&cartItem, cartItemId)
 
-	if cart.ID == 0 {
-		return errors.New("cart not found")
+	if cartItem.ID == 0 {
+		return errors.New("cartItem not found")
 	}
 
-	if err := db.Where("cart_id = ?", cartId).Delete(&model.CartItem{}).Error; err != nil {
+	if err := db.Where("id = ?", cartItemId).Delete(&model.CartItem{}).Error; err != nil {
 		return errors.New("failed to delete cart items")
 	}
-
-	if err := db.Delete(&cart).Error; err != nil {
-		return errors.New("failed to delete cart")
-	}
-
 	return nil
 }

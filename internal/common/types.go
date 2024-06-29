@@ -54,7 +54,7 @@ type CartResponse struct {
 }
 
 type CartItemInfo struct {
-	CartID    uint `json:"cart_id"`
-	VariantID uint `json:"variant_id"`
-	Quantity  int  `json:"quantity"`
+	CartItemID uint `json:"cart_item_id"`
+	VariantID  uint `json:"variant_id"`
+	Quantity   int  `json:"quantity"`
 }

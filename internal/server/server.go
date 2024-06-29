@@ -28,7 +28,7 @@ func StartServer() {
 	//Cart api
 	http.Handle("POST /api/v1/cart", JSONHeaderMiddleware(http.HandlerFunc(cart.AddItemCartHandler)))
 	http.Handle("GET /api/v1/cart/{user_id}", JSONHeaderMiddleware(http.HandlerFunc(cart.FetchCartDetailsHandler)))
-	http.Handle("DELETE /api/v1/cart/{cart_id}", JSONHeaderMiddleware(http.HandlerFunc(cart.RemoveCartItemsHandler)))
+	http.Handle("DELETE /api/v1/cart/{cart_item_id}", JSONHeaderMiddleware(http.HandlerFunc(cart.RemoveCartItemsHandler)))
 
 	//Review api
 	http.Handle("POST /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.CreateReviewHanlder)))

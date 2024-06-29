@@ -30,6 +30,10 @@ func TestCreateCartItem(t *testing.T) {
 	inv := model.Inventory{VariantID: pv.ID, Quantity: 2000, ReorderLevel: 100}
 	db.Create(&inv)
 
+	//count cartItem
+	var count int64
+	db.Model(&model.CartItem{}).Where("id = ?", cartItem.ID).Count(&count)
+
 	dto := common.AddCartItemDto{
 		UserID:           user.ID,
 		ProductVariantID: pv.ID,
@@ -46,6 +50,9 @@ func TestCreateCartItem(t *testing.T) {
 		t.Fail()
 		return
 	}
+
+	//count updated
+	assert.Equal(t, count+1, 1)
 
 	db.Raw("select * from cart_items where product_variant_id = ?", pv.ID).Scan(&pv)
 
@@ -72,6 +79,8 @@ func TestCreateCartItem(t *testing.T) {
 		return
 	}
 
+	assert.Equal(t, count+1, 1)
+
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	slog.Info(string(resPayload))
 
@@ -82,10 +91,16 @@ func TestCreateCartItem(t *testing.T) {
 		return
 	}
 
+	var cartResponse common.CartResponse
+	err = json.Unmarshal(resPayload, &cartResponse)
+	if err != nil {
+		return
+	}
+
 	db.Raw("select * from cart_items where id = ?", cartItem.ID).Scan(&cartItem)
 
 	assert.NotNil(t, cartItem)
-
+	assert.Equal(t, 1, len(cartResponse.CartItems))
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	slog.Info(string(resPayload))
 
@@ -166,7 +181,7 @@ func TestCartItemQuantity(t *testing.T) {
 	}
 
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	assert.Contains(t, string(resPayload), "quantity cannot be negative")
+	assert.Contains(t, string(resPayload), "quantity cannot be zero or negative")
 	slog.Info(string(resPayload))
 }
 
@@ -202,10 +217,15 @@ func TestCartItemInvalidVariantID(t *testing.T) {
 }
 
 func TestRemoveCartItem(t *testing.T) {
-	cart, err := testutil.GetCart()
+
+	var count int64
+	db := database.GetDbConn()
+	db.Model(&model.CartItem{}).Count(&count)
+
+	cartItem, err := testutil.GetCartItem()
 	assert.Nil(t, err)
 
-	// delete cart item non-existent cartId
+	// delete cart item non-existent cartItemId
 	resPayload, resp, err := testutil.MakeReq("DELETE", "/cart/100", nil, nil)
 	if resp.StatusCode != 400 {
 		t.Fail()
@@ -213,14 +233,20 @@ func TestRemoveCartItem(t *testing.T) {
 	}
 
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	assert.Contains(t, string(resPayload), "cart not found")
+	assert.Contains(t, string(resPayload), "cartItem not found")
 
-	// delete cart item exists cartId
-	resPayload, resp, err = testutil.MakeReq("DELETE", "/cart/"+strconv.Itoa(int(cart.ID)), nil, nil)
+	//count 1
+	assert.Equal(t, count+1, 1)
+
+	// delete cart item exists cartItemId
+	resPayload, resp, err = testutil.MakeReq("DELETE", "/cart/"+strconv.Itoa(int(cartItem.ID)), nil, nil)
 	if resp.StatusCode != 200 {
 		t.Fail()
 		return
 	}
+
+	//after delete cartItem count zero
+	assert.Equal(t, count-1, 0)
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.Contains(t, string(resPayload), "cart item deleted successfully")
