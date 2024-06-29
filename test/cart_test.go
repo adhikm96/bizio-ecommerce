@@ -18,7 +18,7 @@ import (
 
 func TestCreateCartItem(t *testing.T) {
 	startServer()
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	user, err := testutil.GetUser()
 	assert.Nil(t, err)
@@ -107,7 +107,7 @@ func TestCreateCartItem(t *testing.T) {
 
 func TestCartItemOutOfStock(t *testing.T) {
 	startServer()
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	user, err := testutil.GetUser()
 	assert.Nil(t, err)
@@ -142,7 +142,7 @@ func TestCartItemOutOfStock(t *testing.T) {
 
 func TestCartItemQuantity(t *testing.T) {
 	startServer()
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	user, err := testutil.GetUser()
 	assert.Nil(t, err)
@@ -177,7 +177,7 @@ func TestCartItemQuantity(t *testing.T) {
 
 func TestCartItemInvalidVariantID(t *testing.T) {
 	startServer()
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	user, err := testutil.GetUser()
 	assert.Nil(t, err)

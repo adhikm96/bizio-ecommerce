@@ -7,7 +7,7 @@ import (
 )
 
 func CheckSameUserIdAndProductIdExists(userId uint, productId uint) bool {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	var exists bool
 
 	row := db.Raw("SELECT EXISTS(SELECT 1 FROM reviews WHERE user_id =? AND product_id =?)", userId, productId).Row()
@@ -25,13 +25,13 @@ func CreateReview(reviewCreateDto common.ReviewCreateDto, productId uint) (*mode
 		ProductID: productId,
 	}
 
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	return &review, db.Create(&review).Error
 }
 
 func GetProductReview(productId uint) []*common.ReviewListDto {
 	var reviews []*common.ReviewListDto
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	db.Table("reviews").Select("id, user_id, product_id, rating, comment").Where("product_id = ?", productId).Scan(&reviews)
 	return reviews
 }

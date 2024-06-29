@@ -29,6 +29,18 @@ type ReviewListDto struct {
 	Comment   string `json:"comment"`
 }
 
+type InventoryDetail struct {
+	Id           uint `json:"id"`
+	Quantity     uint `json:"quantity"`
+	ReorderLevel uint `json:"reorder_level"`
+	VariantID    uint `json:"variant_id"`
+}
+
+type InventoryUpdateDto struct {
+	Quantity     uint `json:"quantity"`
+	ReorderLevel uint `json:"reorder_level"`
+}
+
 type AddCartItemDto struct {
 	UserID           uint `json:"user_id"`
 	ProductVariantID uint `json:"variant_id"`

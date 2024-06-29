@@ -3,7 +3,6 @@ package test_util
 import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
-
 	"github.com/shopspring/decimal"
 )
 
@@ -12,7 +11,7 @@ func GetBrand() (*model.Brand, error) {
 		Name:        RandomString(10),
 		Description: "",
 	}
-	res := database.NewDatabaseConnection().Create(&brand)
+	res := database.GetDbConn().Create(&brand)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -24,7 +23,7 @@ func GetCategory() (*model.Category, error) {
 		Name:        RandomString(10),
 		Description: "",
 	}
-	res := database.NewDatabaseConnection().Create(&category)
+	res := database.GetDbConn().Create(&category)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -44,7 +43,7 @@ func GetVariant() (*model.ProductVariant, error) {
 		Price:     decimal.Decimal{},
 		ProductID: product.ID,
 	}
-	res := database.NewDatabaseConnection().Create(&variant)
+	res := database.GetDbConn().Create(&variant)
 
 	if res.Error != nil {
 		return nil, res.Error
@@ -57,7 +56,7 @@ func GetAttribute() (*model.Attribute, error) {
 		Name: "attribute1",
 	}
 
-	res := database.NewDatabaseConnection().Create(&attr)
+	res := database.GetDbConn().Create(&attr)
 
 	if res.Error != nil {
 		return nil, res.Error
@@ -85,7 +84,8 @@ func GetProduct() (*model.Product, error) {
 		CategoryID:  cat.ID,
 		BrandID:     brand.ID,
 	}
-	res := database.NewDatabaseConnection().Create(&product)
+
+	res := database.GetDbConn().Create(&product)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -105,7 +105,7 @@ func GetInventory() (*model.Inventory, error) {
 		VariantID:    variant.ID,
 	}
 
-	res := database.NewDatabaseConnection().Create(&inventory)
+	res := database.GetDbConn().Create(&inventory)
 
 	if res.Error != nil {
 		return nil, res.Error
@@ -121,7 +121,7 @@ func GetUser() (*model.User, error) {
 		PasswordHash: "password",
 	}
 
-	res := database.NewDatabaseConnection().Create(&user)
+	res := database.GetDbConn().Create(&user)
 
 	if res.Error != nil {
 		return nil, res.Error
@@ -140,7 +140,7 @@ func GetCart() (*model.Cart, error) {
 		UserID: user.ID,
 	}
 
-	res := database.NewDatabaseConnection().Create(&cart)
+	res := database.GetDbConn().Create(&cart)
 
 	if res.Error != nil {
 		return nil, res.Error
@@ -167,7 +167,7 @@ func GetCartItem() (*model.CartItem, error) {
 		Quantity:         10,
 	}
 
-	res := database.NewDatabaseConnection().Create(&cartItem)
+	res := database.GetDbConn().Create(&cartItem)
 
 	if res.Error != nil {
 		return nil, res.Error

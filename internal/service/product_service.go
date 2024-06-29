@@ -6,7 +6,7 @@ import (
 )
 
 func CheckProductExists(productId uint) bool {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	var product model.Product
 	if err := db.First(&product, productId).Error; err != nil {
 		return false

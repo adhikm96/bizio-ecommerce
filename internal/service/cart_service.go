@@ -8,7 +8,7 @@ import (
 )
 
 func CheckStockAvailable(quantity int, pvId uint) (bool, error) {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	var inv model.Inventory
 
 	if err := db.Where("variant_id = ?", pvId).First(&inv).Error; err != nil {
@@ -22,7 +22,7 @@ func CheckStockAvailable(quantity int, pvId uint) (bool, error) {
 }
 
 func AddItemCart(addCartItemDto common.AddCartItemDto) (*model.CartItem, error) {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	var cart model.Cart
 	if err := db.Raw("select * from carts where user_id = ?", &addCartItemDto.UserID).Scan(&cart); err != nil {
@@ -44,7 +44,7 @@ func AddItemCart(addCartItemDto common.AddCartItemDto) (*model.CartItem, error) 
 }
 
 func FetchCartItem(userId uint) ([]common.CartResponse, error) {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	var carts []model.Cart
 
 	db.Preload("CartItems.ProductVariant").Where("user_id = ?", userId).Find(&carts)
@@ -76,7 +76,7 @@ func FetchCartItem(userId uint) ([]common.CartResponse, error) {
 }
 
 func RemoveCartItem(cartId uint) error {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	var cart model.Cart
 
 	db.First(&cart, cartId)
