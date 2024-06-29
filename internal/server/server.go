@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler"
+	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/inventory"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/notification"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/order"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/review"
@@ -32,6 +33,9 @@ func StartServer() {
 	http.Handle("GET /api/v1/orders/{order_id}", JSONHeaderMiddleware(http.HandlerFunc(order.FetchOrderHandler)))
 	http.Handle("POST /api/v1/orders/{order_id}", JSONHeaderMiddleware(http.HandlerFunc(order.CreateOrderHandler)))
 	http.Handle("PUT /api/v1/orders/{order_id}", JSONHeaderMiddleware(http.HandlerFunc(order.UpdateOrderStatusHandler)))
+
+	http.Handle("GET /api/v1/inventory/{variantId}", JSONHeaderMiddleware(http.HandlerFunc(inventory.FetchInventoryHandler)))
+	http.Handle("PUT /api/v1/admin/inventory/{variantId}", JSONHeaderMiddleware(http.HandlerFunc(inventory.UpdateInventoryHandler)))
 
 	slog.Info("starting server at :8000")
 

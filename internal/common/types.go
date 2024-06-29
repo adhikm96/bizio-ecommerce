@@ -47,3 +47,15 @@ type OrderResp struct {
 	DiscountCode   string            `json:"discount_code"`
 	Status         model.OrderStatus `json:"status"`
 }
+
+type InventoryDetail struct {
+	Id           uint `json:"id"`
+	Quantity     uint `json:"quantity"`
+	ReorderLevel uint `json:"reorder_level"`
+	VariantID    uint `json:"variant_id"`
+}
+
+type InventoryUpdateDto struct {
+	Quantity     uint `json:"quantity"`
+	ReorderLevel uint `json:"reorder_level"`
+}

@@ -8,14 +8,14 @@ import (
 )
 
 func FetchUserNotifications(userId uint) []*common.NotificationListDto {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	var notifications []*common.NotificationListDto
 	db.Raw("SELECT id, user_id, notification_type, message, status FROM notifications WHERE user_id = ?", userId).Scan(&notifications)
 	return notifications
 }
 
 func UpdateNotificationAsRead(nId uint) error {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	var notification model.Notification
 
 	db.Find(&notification, "id = ?", nId)
@@ -43,6 +43,6 @@ func CreateNotification(notificationCreateDto common.NotificationCreateDto) (*mo
 		Status:           model.UNREAD_NOTIFICATION,
 	}
 
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	return &notification, db.Create(&notification).Error
 }
