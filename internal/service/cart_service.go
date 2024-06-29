@@ -50,7 +50,7 @@ func FetchCartItem(userId uint) ([]common.CartResponse, error) {
 	db.Preload("CartItems.ProductVariant").Where("user_id = ?", userId).Find(&carts)
 
 	if len(carts) == 0 {
-		return nil, errors.New("cart_item not found for user the user")
+		return nil, errors.New("cart_item not found for user")
 	}
 
 	var cartResponses []common.CartResponse

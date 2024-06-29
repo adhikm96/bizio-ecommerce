@@ -5,7 +5,6 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
-	"github.com/Digital-AIR/bizio-ecommerce/internal/server"
 	testutil "github.com/Digital-AIR/bizio-ecommerce/test/util"
 	"github.com/stretchr/testify/assert"
 	"log/slog"
@@ -13,11 +12,9 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
-	"time"
 )
 
 func TestCreateCartItem(t *testing.T) {
-	startServer()
 	db := database.GetDbConn()
 
 	user, err := testutil.GetUser()
@@ -106,7 +103,6 @@ func TestCreateCartItem(t *testing.T) {
 }
 
 func TestCartItemOutOfStock(t *testing.T) {
-	startServer()
 	db := database.GetDbConn()
 
 	user, err := testutil.GetUser()
@@ -119,7 +115,7 @@ func TestCartItemOutOfStock(t *testing.T) {
 	inv := model.Inventory{VariantID: pv.ID, Quantity: 2000, ReorderLevel: 100}
 	db.Create(&inv)
 
-	//quantity negative
+	//check quantity out-of-stock
 	dto := common.AddCartItemDto{
 		UserID:           user.ID,
 		ProductVariantID: pv.ID,
@@ -141,7 +137,6 @@ func TestCartItemOutOfStock(t *testing.T) {
 }
 
 func TestCartItemQuantity(t *testing.T) {
-	startServer()
 	db := database.GetDbConn()
 
 	user, err := testutil.GetUser()
@@ -176,7 +171,6 @@ func TestCartItemQuantity(t *testing.T) {
 }
 
 func TestCartItemInvalidVariantID(t *testing.T) {
-	startServer()
 	db := database.GetDbConn()
 
 	user, err := testutil.GetUser()
@@ -208,8 +202,6 @@ func TestCartItemInvalidVariantID(t *testing.T) {
 }
 
 func TestRemoveCartItem(t *testing.T) {
-	startServer()
-
 	cart, err := testutil.GetCart()
 	assert.Nil(t, err)
 
@@ -233,8 +225,4 @@ func TestRemoveCartItem(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.Contains(t, string(resPayload), "cart item deleted successfully")
 
-}
-func startServer() {
-	go server.InitServer()
-	time.Sleep(time.Second * 1)
 }
