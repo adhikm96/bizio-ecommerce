@@ -1,11 +1,11 @@
 package database
 
 import (
+	"github.com/Digital-AIR/bizio-ecommerce/internal/config"
 	"gorm.io/gorm/logger"
 	"log"
 	"log/slog"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
@@ -20,7 +20,7 @@ func NewDatabaseConnection() *gorm.DB {
 		return db
 	}
 
-	dbUrl := "postgresql://" + os.Getenv("DB_USERNAME") + ":" + os.Getenv("DB_PASSWORD") + "@" + os.Getenv("DB_HOST") + ":" + os.Getenv("DB_PORT") + "/" + os.Getenv("DB_NAME")
+	dbUrl := "postgresql://" + config.Get("DB_USERNAME") + ":" + config.Get("DB_PASSWORD") + "@" + config.Get("DB_HOST") + ":" + config.Get("DB_PORT") + "/" + config.Get("DB_NAME")
 
 	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{
 		Logger: logger.New(
@@ -37,7 +37,7 @@ func NewDatabaseConnection() *gorm.DB {
 
 	sqlDB, _ := db.DB()
 
-	maxOpenConn, _ := strconv.Atoi(os.Getenv("DB_POOL_MAX_SIZE"))
+	maxOpenConn := config.GetInt("DB_POOL_MAX_SIZE")
 	sqlDB.SetMaxOpenConns(maxOpenConn)
 
 	if err != nil {
