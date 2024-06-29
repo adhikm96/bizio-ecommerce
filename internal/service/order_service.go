@@ -7,15 +7,19 @@ import (
 	"log/slog"
 )
 
-func CreateOrder(orderCreateDto *common.OrderCreateDto) (*model.Order, error) {
+func CreateOrder(orderCreateDto *common.OrderCreateDto) (*common.OrderResp, error) {
+	totalAmt := FetchTotalAmtFromCart(orderCreateDto.CartId)
+	discount := CalDiscount(orderCreateDto.DiscountCode, totalAmt)
+	finalAmt := totalAmt - discount
+
 	order := model.Order{
-		UserID:         0,
-		AddressID:      0,
-		TotalAmount:    0,
-		DiscountAmount: 0,
-		FinalAmount:    0,
-		DiscountCode:   "",
-		Status:         "",
+		UserID:         orderCreateDto.UserId,
+		AddressID:      orderCreateDto.AddressId,
+		TotalAmount:    totalAmt,
+		DiscountAmount: discount,
+		FinalAmount:    finalAmt,
+		DiscountCode:   orderCreateDto.DiscountCode,
+		Status:         "created",
 	}
 
 	db := database.NewDatabaseConnection()
@@ -27,5 +31,21 @@ func CreateOrder(orderCreateDto *common.OrderCreateDto) (*model.Order, error) {
 		return nil, res.Error
 	}
 
-	return &order, nil
+	return MakeOrderResp(order), nil
+}
+
+func MakeOrderResp(order model.Order) *common.OrderResp {
+	return &common.OrderResp{
+		TotalAmount:    order.TotalAmount,
+		DiscountAmount: order.DiscountAmount,
+		FinalAmount:    order.FinalAmount,
+		DiscountCode:   order.DiscountCode,
+		Status:         order.Status,
+	}
+}
+
+func FetchTotalAmtFromCart(cartId uint) float64 {
+	total := 0.0
+	database.NewDatabaseConnection().Raw("select sum(product_variants.price) from cart_items join product_variants on product_variants.id = cart_items.product_variant_id = product_variants.id where product_variants.id = ?", cartId).Scan(&total)
+	return total
 }

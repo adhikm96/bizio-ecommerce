@@ -39,3 +39,11 @@ type OrderCreateDto struct {
 type OrderUpdateDto struct {
 	OrderStatus model.OrderStatus
 }
+
+type OrderResp struct {
+	TotalAmount    float64           `json:"total_amount"`
+	DiscountAmount float64           `json:"discount_amount"`
+	FinalAmount    float64           `json:"final_amount"`
+	DiscountCode   string            `json:"discount_code"`
+	Status         model.OrderStatus `json:"status"`
+}
