@@ -15,7 +15,7 @@ import (
 
 var db *gorm.DB
 
-func NewDatabaseConnection() *gorm.DB {
+func GetDbConn() *gorm.DB {
 	if db != nil {
 		return db
 	}
@@ -48,7 +48,7 @@ func NewDatabaseConnection() *gorm.DB {
 }
 
 func MigrateDBSchema() {
-	db = NewDatabaseConnection()
+	db = GetDbConn()
 	err := db.AutoMigrate(
 		&model.User{},
 		&model.Notification{},

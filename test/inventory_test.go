@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
+	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/inventory"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 	test_util "github.com/Digital-AIR/bizio-ecommerce/test/util"
 	"github.com/stretchr/testify/assert"
@@ -12,9 +13,58 @@ import (
 	"testing"
 )
 
+func TestHighQuantityCheck(t *testing.T) {
+	db := database.GetDbConn()
+
+	variant, err := test_util.GetVariant()
+	assert.Nil(t, err)
+
+	inv := model.Inventory{}
+
+	db.Raw("select * from inventories where variant_id = ?", variant.ID).Scan(&inv)
+
+	assert.Equal(t, uint(0), inv.ID)
+
+	invUpdateDto := common.InventoryUpdateDto{
+		Quantity:     inventory.HighStockQuantityThreshold + 1,
+		ReorderLevel: 500,
+	}
+
+	data, err := json.Marshal(invUpdateDto)
+	assert.Nil(t, err)
+
+	errResp, _, err := test_util.MakeReq("PUT", "/admin/inventory/"+strconv.Itoa(int(variant.ID)), data, nil)
+	assert.NotNil(t, err)
+
+	errorMap := make(map[string]string)
+
+	err = json.Unmarshal(errResp, &errorMap)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, "quantity should be less or equals "+strconv.Itoa(inventory.HighStockQuantityThreshold), errorMap["quantity"])
+
+	invUpdateDto = common.InventoryUpdateDto{
+		Quantity:     inventory.HighStockQuantityThreshold,
+		ReorderLevel: 500,
+	}
+
+	data, err = json.Marshal(invUpdateDto)
+	assert.Nil(t, err)
+
+	_, _, err = test_util.MakeReq("PUT", "/admin/inventory/"+strconv.Itoa(int(variant.ID)), data, nil)
+	assert.Nil(t, err)
+
+	db.Raw("select * from inventories where variant_id = ?", variant.ID).Scan(&inv)
+
+	assert.NotEqual(t, uint(0), inv.ID)
+	assert.Equal(t, invUpdateDto.Quantity, inv.Quantity)
+	assert.Equal(t, invUpdateDto.ReorderLevel, inv.ReorderLevel)
+}
+
 func TestNewInventoryCreate(t *testing.T) {
 
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	variant, err := test_util.GetVariant()
 	assert.Nil(t, err)
@@ -92,7 +142,7 @@ func TestInventoryFlow(t *testing.T) {
 	_, _, err = test_util.MakeReq("PUT", "/admin/inventory/"+strconv.Itoa(int(inventory.VariantID)), data, nil)
 	assert.Nil(t, err)
 
-	database.NewDatabaseConnection().First(&inventory, "id = ?", inventory.ID)
+	database.GetDbConn().First(&inventory, "id = ?", inventory.ID)
 
 	assert.Equal(t, inventory.Quantity, invUpdateDto.Quantity)
 	assert.Equal(t, inventory.ReorderLevel, invUpdateDto.ReorderLevel)

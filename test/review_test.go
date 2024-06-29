@@ -15,7 +15,7 @@ import (
 )
 
 func TestCreateValidReview(t *testing.T) {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	category := model.Category{Name: "testcategory", Description: "test category description"}
 	db.Create(&category)

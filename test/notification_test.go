@@ -21,7 +21,7 @@ func TestNotificationsHandler(t *testing.T) {
 
 	// create notification test
 
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	res := db.Create(&user1)
 

@@ -6,7 +6,10 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/service"
 	"log/slog"
 	"net/http"
+	"strconv"
 )
+
+const HighStockQuantityThreshold = 99999
 
 func FetchInventoryHandler(writer http.ResponseWriter, request *http.Request) {
 	variantId, err := common.FetchPathVariable(writer, request, "variantId")
@@ -50,6 +53,8 @@ func UpdateInventoryHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	// TODO : admin user check pending
+
 	err = service.UpdateInventory(uint(variantId), invUpdateDto)
 
 	if err != nil {
@@ -62,6 +67,10 @@ func ValidReqPayload(dto common.InventoryUpdateDto) map[string]string {
 
 	if dto.Quantity <= 0 {
 		errMap["quantity"] = "quantity should be greater than zero"
+	}
+
+	if dto.Quantity > HighStockQuantityThreshold {
+		errMap["quantity"] = "quantity should be less or equals " + strconv.Itoa(HighStockQuantityThreshold)
 	}
 
 	if dto.ReorderLevel <= 0 {

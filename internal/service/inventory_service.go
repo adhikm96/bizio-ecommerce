@@ -9,7 +9,7 @@ import (
 
 func FetchInventory(variantId uint) (*common.InventoryDetail, error) {
 	var inv common.InventoryDetail
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	db.Raw("select id, quantity, reorder_level, variant_id from inventories where variant_id = ?", variantId).Scan(&inv)
 
 	if inv.Id == 0 {
@@ -21,7 +21,7 @@ func FetchInventory(variantId uint) (*common.InventoryDetail, error) {
 func UpdateInventory(variantId uint, dto common.InventoryUpdateDto) error {
 	inventory := model.Inventory{}
 
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	db.Find(&inventory, "variant_id = ?", variantId)
 
