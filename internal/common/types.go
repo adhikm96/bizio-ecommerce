@@ -28,3 +28,14 @@ type ReviewListDto struct {
 	Rating    uint   `json:"rating"`
 	Comment   string `json:"comment"`
 }
+
+type OrderCreateDto struct {
+	CartId       uint   `json:"cart_id"`
+	DiscountCode string `json:"discount_code"`
+	UserId       uint   `json:"user_id"`
+	AddressId    uint   `json:"address_id"`
+}
+
+type OrderUpdateDto struct {
+	OrderStatus model.OrderStatus
+}
