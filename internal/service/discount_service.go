@@ -13,7 +13,7 @@ func CalDiscount(discountCode string, amt float64) float64 {
 	discount, err := FetchDiscount(discountCode)
 
 	if err != nil {
-		slog.Debug(discount.Code + " : " + err.Error())
+		slog.Debug(err.Error())
 		return 0
 	}
 
@@ -46,7 +46,7 @@ func IsValidDiscount(discount *model.Discount) bool {
 func FetchDiscount(discountCode string) (*model.Discount, error) {
 	discount := model.Discount{}
 
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 
 	db.Find(&discount, "code = ?", discountCode)
 

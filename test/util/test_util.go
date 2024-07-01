@@ -2,6 +2,7 @@ package test_util
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/server"
@@ -23,6 +24,14 @@ func RandomString(n int) string {
 
 func GetServerUrl(url string) string {
 	return "http://localhost:8000/api/v1" + url
+}
+
+func MakeReqWithBody(reqType string, url string, body interface{}, cookie *http.Cookie) ([]byte, *http.Response, error) {
+	data, err := json.Marshal(body)
+	if err != nil {
+		return nil, nil, err
+	}
+	return MakeReq(reqType, url, data, cookie)
 }
 
 func MakeReq(reqType string, url string, payload []byte, cookie *http.Cookie) ([]byte, *http.Response, error) {

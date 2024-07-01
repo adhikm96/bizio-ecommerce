@@ -26,12 +26,12 @@ func StartServer() {
 	http.Handle("PUT /api/v1/notifications/{id}/read", JSONHeaderMiddleware(http.HandlerFunc(notification.UpdateReadNotification)))
 
 	//Review api
-	http.Handle("POST /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.CreateReviewHanlder)))
+	http.Handle("POST /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.CreateReviewHandler)))
 	http.Handle("GET /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.FetchReviewHandler)))
 
 	// order api
 	http.Handle("GET /api/v1/orders/{order_id}", JSONHeaderMiddleware(http.HandlerFunc(order.FetchOrderHandler)))
-	http.Handle("POST /api/v1/orders/{order_id}", JSONHeaderMiddleware(http.HandlerFunc(order.CreateOrderHandler)))
+	http.Handle("POST /api/v1/orders", JSONHeaderMiddleware(http.HandlerFunc(order.CreateOrderHandler)))
 	http.Handle("PUT /api/v1/orders/{order_id}", JSONHeaderMiddleware(http.HandlerFunc(order.UpdateOrderStatusHandler)))
 
 	http.Handle("GET /api/v1/inventory/{variantId}", JSONHeaderMiddleware(http.HandlerFunc(inventory.FetchInventoryHandler)))

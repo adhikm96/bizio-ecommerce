@@ -2,6 +2,12 @@ package model
 
 type OrderStatus string
 
+var ValidOrdersStatus = []string{ // for now taken only three
+	"created",
+	"cancelled",
+	"completed",
+}
+
 type Order struct {
 	BaseEntity
 	UserID         uint        `json:"user_id" gorm:"index:idx_orders_user_id"`

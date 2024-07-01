@@ -5,7 +5,7 @@ import (
 )
 
 func FindOutOfStockItems(cartId uint) []uint {
-	db := database.NewDatabaseConnection()
+	db := database.GetDbConn()
 	var outOfStockCartItems []uint
 
 	// fetch cartItemId where variant's quantity < cart item quantity

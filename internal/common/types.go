@@ -37,10 +37,11 @@ type OrderCreateDto struct {
 }
 
 type OrderUpdateDto struct {
-	OrderStatus model.OrderStatus
+	OrderStatus model.OrderStatus `json:"order_status"`
 }
 
 type OrderResp struct {
+	Id             uint              `json:"id"`
 	TotalAmount    float64           `json:"total_amount"`
 	DiscountAmount float64           `json:"discount_amount"`
 	FinalAmount    float64           `json:"final_amount"`
@@ -58,4 +59,21 @@ type InventoryDetail struct {
 type InventoryUpdateDto struct {
 	Quantity     uint `json:"quantity"`
 	ReorderLevel uint `json:"reorder_level"`
+}
+
+type OrderDetails struct {
+	ID             uint              `json:"id"`
+	UserID         uint              `json:"user_id"`
+	AddressID      uint              `json:"address_id"`
+	TotalAmount    float64           `json:"total_amount"`
+	DiscountAmount float64           `json:"discount_amount"`
+	FinalAmount    float64           `json:"final_amount"`
+	DiscountCode   string            `json:"discount_code"`
+	Status         model.OrderStatus `json:"status"`
+}
+
+type OrderItemCreate struct {
+	Quantity uint    `json:"quantity"`
+	Price    float64 `json:"price"`
+	PvId     uint    `json:"pv_id"`
 }
