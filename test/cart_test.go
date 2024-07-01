@@ -30,6 +30,9 @@ func TestCreateCartItem(t *testing.T) {
 	inv := model.Inventory{VariantID: pv.ID, Quantity: 2000, ReorderLevel: 100}
 	db.Create(&inv)
 
+	//clear cart item table
+	db.Delete(&cartItem)
+
 	//count cartItem
 	var count int64
 	db.Model(&model.CartItem{}).Where("id = ?", cartItem.ID).Count(&count)
@@ -51,8 +54,11 @@ func TestCreateCartItem(t *testing.T) {
 		return
 	}
 
+	var updatedCount int64
+	db.Model(&model.CartItem{}).Count(&updatedCount)
+
 	//count updated
-	assert.Equal(t, count+1, 1)
+	assert.Equal(t, count+1, updatedCount)
 
 	db.Raw("select * from cart_items where product_variant_id = ?", pv.ID).Scan(&pv)
 
@@ -79,10 +85,12 @@ func TestCreateCartItem(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, count+1, 1)
-
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	slog.Info(string(resPayload))
+
+	//check count updated
+	db.Model(&model.CartItem{}).Count(&updatedCount)
+	assert.Equal(t, count+1, updatedCount)
 
 	//get cart item api
 	resPayload, resp, err = testutil.MakeReq("GET", "/cart/"+strconv.Itoa(int(user.ID)), nil, nil)
@@ -217,16 +225,22 @@ func TestCartItemInvalidVariantID(t *testing.T) {
 }
 
 func TestRemoveCartItem(t *testing.T) {
-
-	var count int64
 	db := database.GetDbConn()
-	db.Model(&model.CartItem{}).Count(&count)
 
-	cartItem, err := testutil.GetCartItem()
+	cart, err := testutil.GetCart()
 	assert.Nil(t, err)
 
+	pv, err := testutil.GetVariant()
+	assert.Nil(t, err)
+
+	cartItem := model.CartItem{CartID: cart.ID, ProductVariantID: pv.ID, Quantity: 10}
+	db.Create(&cartItem)
+
+	var count int64
+	db.Model(&model.CartItem{}).Count(&count)
+
 	// delete cart item non-existent cartItemId
-	resPayload, resp, err := testutil.MakeReq("DELETE", "/cart/100", nil, nil)
+	resPayload, resp, err := testutil.MakeReq("DELETE", "/cart/"+strconv.Itoa(rand.Int()), nil, nil)
 	if resp.StatusCode != 400 {
 		t.Fail()
 		return
@@ -235,8 +249,10 @@ func TestRemoveCartItem(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	assert.Contains(t, string(resPayload), "cartItem not found")
 
-	//count 1
-	assert.Equal(t, count+1, 1)
+	var updatedCount int64
+	db.Model(&model.CartItem{}).Count(&updatedCount)
+
+	assert.Equal(t, count, updatedCount)
 
 	// delete cart item exists cartItemId
 	resPayload, resp, err = testutil.MakeReq("DELETE", "/cart/"+strconv.Itoa(int(cartItem.ID)), nil, nil)
@@ -245,8 +261,9 @@ func TestRemoveCartItem(t *testing.T) {
 		return
 	}
 
-	//after delete cartItem count zero
-	assert.Equal(t, count-1, 0)
+	//after delete cartItem
+	db.Model(&model.CartItem{}).Count(&updatedCount)
+	assert.Equal(t, count-1, updatedCount)
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.Contains(t, string(resPayload), "cart item deleted successfully")
