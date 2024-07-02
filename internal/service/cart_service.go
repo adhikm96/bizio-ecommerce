@@ -98,3 +98,10 @@ func FindOutOfStockItems(cartId uint) ([]uint, error) {
 	// fetch cartItemId where variant's quantity < cart item quantity
 	return outOfStockCartItems, db.Raw("select cart_items.id from cart_items left join inventories on inventories.variant_id = cart_items.product_variant_id where cart_items.cart_id = ? and (inventories.id is null or inventories.quantity < cart_items.quantity)", cartId).Scan(&outOfStockCartItems).Error
 }
+
+func CheckCartExists(cartId uint) bool {
+	db := database.GetDbConn()
+	cart := model.Cart{}
+	db.Find(&cart, "id = ?", cartId)
+	return cart.ID != 0
+}

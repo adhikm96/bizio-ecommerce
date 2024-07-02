@@ -88,7 +88,7 @@ func CreateOrderHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// check cartItem is available
-	if outOfStockCartItems, err := service.FindOutOfStockItems(createOrderDto.CartId); len(outOfStockCartItems) > 0 {
+	if outOfStockCartItems, err := service.FindOutOfStockItems(createOrderDto.CartId); len(outOfStockCartItems) > 0 || err != nil {
 		if err != nil {
 			slog.Error(err.Error())
 			common.HandleErrorRes(writer, map[string]string{"message": "failed to create order"})
@@ -103,6 +103,7 @@ func CreateOrderHandler(writer http.ResponseWriter, request *http.Request) {
 
 	if err != nil {
 		common.HandleErrorRes(writer, map[string]string{"message": "failed to create order"})
+		return
 	}
 
 	err = json.NewEncoder(writer).Encode(&orderResp)
@@ -114,6 +115,15 @@ func CreateOrderHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func validateOrderCreate(dto common.OrderCreateDto) map[string]string {
-	// nothing to validate as of now
-	return map[string]string{}
+	errMap := make(map[string]string)
+
+	// check cartId & addressId exists
+	if !service.CheckCartExists(dto.CartId) {
+		errMap["cart_id"] = "cart_id does not exist"
+	}
+
+	if !service.CheckAddressExists(dto.AddressId) {
+		errMap["address_id"] = "address_id does not exist"
+	}
+	return errMap
 }
