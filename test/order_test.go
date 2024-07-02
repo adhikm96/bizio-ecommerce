@@ -5,7 +5,6 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
-	"github.com/Digital-AIR/bizio-ecommerce/internal/server"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/service"
 	test_util "github.com/Digital-AIR/bizio-ecommerce/test/util"
 	"github.com/stretchr/testify/assert"
@@ -145,8 +144,6 @@ func TestOrderCreateWithStock(t *testing.T) {
 }
 
 func TestOrderCreateWithStockWithDiscount(t *testing.T) {
-	go server.InitServer()
-
 	discount, err := test_util.GetDiscount(50)
 	assert.Nil(t, err)
 

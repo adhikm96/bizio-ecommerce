@@ -85,6 +85,7 @@ func GetProduct() (*model.Product, error) {
 		CategoryID:  cat.ID,
 		BrandID:     brand.ID,
 	}
+
 	res := database.GetDbConn().Create(&product)
 	if res.Error != nil {
 		return nil, res.Error
@@ -192,4 +193,51 @@ func GetDiscount(percentage float64) (*model.Discount, error) {
 	}
 
 	return &discount, database.GetDbConn().Create(&discount).Error
+}
+
+func GetCart() (*model.Cart, error) {
+	user, err := GetUser()
+
+	if err != nil {
+		return nil, err
+	}
+
+	cart := model.Cart{
+		UserID: user.ID,
+	}
+
+	res := database.GetDbConn().Create(&cart)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &cart, nil
+}
+
+func GetCartItem() (*model.CartItem, error) {
+	cart, err := GetCart()
+
+	if err != nil {
+		return nil, err
+	}
+
+	pv, err := GetVariant()
+	if err != nil {
+		return nil, err
+	}
+
+	cartItem := model.CartItem{
+		CartID:           cart.ID,
+		ProductVariantID: pv.ID,
+		Quantity:         10,
+	}
+
+	res := database.GetDbConn().Create(&cartItem)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &cartItem, nil
 }
