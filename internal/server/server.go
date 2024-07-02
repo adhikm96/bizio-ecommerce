@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler"
+	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/cart"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/inventory"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/notification"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/review"
@@ -23,6 +24,11 @@ func StartServer() {
 	http.Handle("POST /api/v1/notifications", JSONHeaderMiddleware(http.HandlerFunc(notification.CreateHandler)))
 	http.Handle("GET /api/v1/notifications/{user_id}", JSONHeaderMiddleware(http.HandlerFunc(notification.UsersNotificationHandler)))
 	http.Handle("PUT /api/v1/notifications/{id}/read", JSONHeaderMiddleware(http.HandlerFunc(notification.UpdateReadNotification)))
+
+	//Cart api
+	http.Handle("POST /api/v1/cart", JSONHeaderMiddleware(http.HandlerFunc(cart.AddItemCartHandler)))
+	http.Handle("GET /api/v1/cart/{user_id}", JSONHeaderMiddleware(http.HandlerFunc(cart.FetchCartDetailsHandler)))
+	http.Handle("DELETE /api/v1/cart/{cart_item_id}", JSONHeaderMiddleware(http.HandlerFunc(cart.RemoveCartItemsHandler)))
 
 	//Review api
 	http.Handle("POST /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.CreateReviewHanlder)))

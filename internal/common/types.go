@@ -40,3 +40,21 @@ type InventoryUpdateDto struct {
 	Quantity     uint `json:"quantity"`
 	ReorderLevel uint `json:"reorder_level"`
 }
+
+type AddCartItemDto struct {
+	UserID           uint `json:"user_id"`
+	ProductVariantID uint `json:"variant_id"`
+	Quantity         int  `json:"quantity"`
+}
+
+type CartResponse struct {
+	ID        uint           `json:"id"`
+	UserID    uint           `json:"user_id"`
+	CartItems []CartItemInfo `json:"cart_items"`
+}
+
+type CartItemInfo struct {
+	CartItemID uint `json:"cart_item_id"`
+	VariantID  uint `json:"variant_id"`
+	Quantity   int  `json:"quantity"`
+}

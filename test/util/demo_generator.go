@@ -84,6 +84,7 @@ func GetProduct() (*model.Product, error) {
 		CategoryID:  cat.ID,
 		BrandID:     brand.ID,
 	}
+
 	res := database.GetDbConn().Create(&product)
 	if res.Error != nil {
 		return nil, res.Error
@@ -111,4 +112,66 @@ func GetInventory() (*model.Inventory, error) {
 	}
 
 	return &inventory, nil
+}
+
+func GetUser() (*model.User, error) {
+	user := model.User{
+		Username:     RandomString(5),
+		Email:        RandomString(5) + "@example.com",
+		PasswordHash: "password",
+	}
+
+	res := database.GetDbConn().Create(&user)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return &user, nil
+}
+
+func GetCart() (*model.Cart, error) {
+	user, err := GetUser()
+
+	if err != nil {
+		return nil, err
+	}
+
+	cart := model.Cart{
+		UserID: user.ID,
+	}
+
+	res := database.GetDbConn().Create(&cart)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &cart, nil
+}
+
+func GetCartItem() (*model.CartItem, error) {
+	cart, err := GetCart()
+
+	if err != nil {
+		return nil, err
+	}
+
+	pv, err := GetVariant()
+	if err != nil {
+		return nil, err
+	}
+
+	cartItem := model.CartItem{
+		CartID:           cart.ID,
+		ProductVariantID: pv.ID,
+		Quantity:         10,
+	}
+
+	res := database.GetDbConn().Create(&cartItem)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &cartItem, nil
 }

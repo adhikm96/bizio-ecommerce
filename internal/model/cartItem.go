@@ -6,5 +6,5 @@ type CartItem struct {
 	Cart             Cart           `gorm:"constraint:OnDelete:CASCADE"`
 	ProductVariantID uint           `json:"variant_id" gorm:"index:idx_cart_items_variant_id"`
 	ProductVariant   ProductVariant `gorm:"foreignKey:ProductVariantID"`
-	Quantity         uint           `json:"quantity" gorm:"not null"`
+	Quantity         int            `json:"quantity" gorm:"not null"`
 }
