@@ -193,38 +193,3 @@ func GetDiscount(percentage float64) (*model.Discount, error) {
 
 	return &discount, database.GetDbConn().Create(&discount).Error
 }
-
-//func GetOrder() (*model.Order, error) {
-//	discount, err := GetDiscount(100)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	address, err := GetAddress()
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	user, err := GetUser()
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	cart := model.Cart{
-//		UserID: user.ID,
-//	}
-//
-//	db := database.GetDbConn()
-//
-//	order := model.Order{
-//		UserID:         user.ID,
-//		AddressID:      address.ID,
-//		TotalAmount:    100,
-//		DiscountAmount: 0,
-//		FinalAmount:    100,
-//		DiscountCode:   discount.Code,
-//		Status:         "created",
-//	}
-//
-//	return &order, db.Create(order).Error
-//}

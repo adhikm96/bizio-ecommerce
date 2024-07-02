@@ -5,15 +5,10 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/common"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
+	"gorm.io/gorm"
 	"log/slog"
+	"slices"
 )
-
-var orderSlice = []string{
-	"created",
-	"paid",
-	"cancelled",
-	"completed",
-}
 
 func CreateOrder(orderCreateDto *common.OrderCreateDto) (*common.OrderResp, error) {
 	totalAmt := FetchTotalAmtFromCart(orderCreateDto.CartId)
@@ -27,20 +22,24 @@ func CreateOrder(orderCreateDto *common.OrderCreateDto) (*common.OrderResp, erro
 		DiscountAmount: discount,
 		FinalAmount:    finalAmt,
 		DiscountCode:   orderCreateDto.DiscountCode,
-		Status:         "created",
+		Status:         model.DeliveryState,
 	}
 
 	db := database.GetDbConn()
 
-	res := db.Create(&order)
+	err := db.Transaction(func(tx *gorm.DB) error {
+		// creating order
+		if err := tx.Create(&order).Error; err != nil {
+			return err
+		}
 
-	if res.Error != nil {
-		slog.Error(res.Error.Error())
-		return nil, res.Error
-	}
+		// creating order items
+		if err := createOrderItems(orderCreateDto.CartId, order.ID, tx); err != nil {
+			return err
+		}
 
-	// create order items
-	err := createOrderItems(orderCreateDto.CartId, order.ID)
+		return nil
+	})
 
 	if err != nil {
 		return nil, err
@@ -49,8 +48,7 @@ func CreateOrder(orderCreateDto *common.OrderCreateDto) (*common.OrderResp, erro
 	return MakeOrderResp(order), nil
 }
 
-func createOrderItems(cartId uint, orderId uint) error {
-	db := database.GetDbConn()
+func createOrderItems(cartId uint, orderId uint, db *gorm.DB) error {
 	var results []common.OrderItemCreate
 
 	// pvId, quantity, price
@@ -92,8 +90,13 @@ func FetchOrder(orderId uint) (*model.Order, error) {
 
 func UpdateOrderStatus(orderId uint, status model.OrderStatus) error {
 	order, err := FetchOrder(orderId)
+
 	if err != nil {
 		return err
+	}
+
+	if slices.Contains(model.FinalOrderState, string(order.Status)) {
+		return errors.New("order already in a final state")
 	}
 
 	order.Status = status
@@ -129,6 +132,13 @@ func FetchOrderDetails(orderId uint) (*common.OrderDetails, error) {
 		return nil, err
 	}
 
+	items, err := FetchOrderItem(orderId)
+
+	if err != nil {
+		slog.Error(err.Error())
+		return nil, errors.New("failed to fetch order items")
+	}
+
 	orderDetails := common.OrderDetails{
 		ID:             order.ID,
 		UserID:         order.UserID,
@@ -138,7 +148,13 @@ func FetchOrderDetails(orderId uint) (*common.OrderDetails, error) {
 		FinalAmount:    order.FinalAmount,
 		DiscountCode:   order.DiscountCode,
 		Status:         order.Status,
+		Items:          items,
 	}
 
 	return &orderDetails, nil
+}
+
+func FetchOrderItem(orderId uint) ([]*common.OrderItemDetail, error) {
+	var items []*common.OrderItemDetail
+	return items, database.GetDbConn().Raw("select order_items.id as id, order_items.quantity, order_items.price, order_items.product_variant_id as pv_id from order_items where order_id = ?", orderId).Scan(&items).Error
 }

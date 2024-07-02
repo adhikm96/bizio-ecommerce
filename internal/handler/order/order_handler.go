@@ -30,7 +30,7 @@ func UpdateOrderStatusHandler(writer http.ResponseWriter, request *http.Request)
 		return
 	}
 
-	err = service.UpdateOrderStatus(uint(orderId), orderUpdateDto.OrderStatus)
+	err = service.UpdateOrderStatus(uint(orderId), orderUpdateDto.Status)
 
 	if err != nil {
 		common.HandleErrorRes(writer, map[string]string{"message": err.Error()})
@@ -40,13 +40,13 @@ func UpdateOrderStatusHandler(writer http.ResponseWriter, request *http.Request)
 func validateOrderUpdate(dto common.OrderUpdateDto) map[string]string {
 	errMap := make(map[string]string)
 
-	if !slices.Contains(model.ValidOrdersStatus, strings.ToLower(string(dto.OrderStatus))) {
-		errMap["order_status"] = "invalid order_status"
+	if dto.Status == "" {
+		errMap["status"] = "status required"
+	}
+	if dto.Status != "" && !slices.Contains(model.ValidOrdersStatus, strings.ToLower(string(dto.Status))) {
+		errMap["status"] = "invalid status"
 	}
 
-	if dto.OrderStatus == "completed" || dto.OrderStatus == "delivered" {
-		errMap["message"] = "order already in a final state"
-	}
 	return errMap
 }
 
@@ -88,7 +88,12 @@ func CreateOrderHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// check cartItem is available
-	if outOfStockCartItems := service.FindOutOfStockItems(createOrderDto.CartId); len(outOfStockCartItems) > 0 {
+	if outOfStockCartItems, err := service.FindOutOfStockItems(createOrderDto.CartId); len(outOfStockCartItems) > 0 {
+		if err != nil {
+			slog.Error(err.Error())
+			common.HandleErrorRes(writer, map[string]string{"message": "failed to create order"})
+			return
+		}
 		common.HandleErrorRes(writer, map[string]string{"message": "some cart items are out of stock"})
 		return
 	}

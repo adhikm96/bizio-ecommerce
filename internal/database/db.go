@@ -2,15 +2,10 @@ package database
 
 import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/config"
-	"gorm.io/gorm/logger"
-	"log"
-	"log/slog"
-	"os"
-	"time"
-
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log/slog"
 )
 
 var db *gorm.DB
@@ -23,16 +18,16 @@ func GetDbConn() *gorm.DB {
 	dbUrl := "postgresql://" + config.Get("DB_USERNAME") + ":" + config.Get("DB_PASSWORD") + "@" + config.Get("DB_HOST") + ":" + config.Get("DB_PORT") + "/" + config.Get("DB_NAME")
 
 	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{
-		Logger: logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-			logger.Config{
-				SlowThreshold:             time.Second, // Slow SQL threshold
-				LogLevel:                  logger.Info, // Log level
-				IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
-				ParameterizedQueries:      true,        // Don't include params in the SQL log
-				Colorful:                  false,       // Disable color
-			},
-		),
+		//Logger: logger.New(
+		//	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		//	logger.Config{
+		//		SlowThreshold:             time.Second, // Slow SQL threshold
+		//		LogLevel:                  logger.Info, // Log level
+		//		IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+		//		ParameterizedQueries:      true,        // Don't include params in the SQL log
+		//		Colorful:                  false,       // Disable color
+		//	},
+		//),
 	})
 
 	sqlDB, _ := db.DB()

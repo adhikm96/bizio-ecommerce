@@ -2,10 +2,20 @@ package model
 
 type OrderStatus string
 
-var ValidOrdersStatus = []string{ // for now taken only three
-	"created",
-	"cancelled",
-	"completed",
+const DeliveryState = "delivery"
+const PaymentState = "payment"
+const ConfirmState = "confirm"
+const CompleteState = "complete"
+
+var ValidOrdersStatus = []string{
+	DeliveryState,
+	PaymentState,
+	ConfirmState,
+	CompleteState,
+}
+
+var FinalOrderState = []string{
+	CompleteState,
 }
 
 type Order struct {
