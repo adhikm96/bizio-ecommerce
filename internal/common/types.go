@@ -29,6 +29,26 @@ type ReviewListDto struct {
 	Comment   string `json:"comment"`
 }
 
+type OrderCreateDto struct {
+	CartId       uint   `json:"cart_id"`
+	DiscountCode string `json:"discount_code"`
+	UserId       uint   `json:"user_id"`
+	AddressId    uint   `json:"address_id"`
+}
+
+type OrderUpdateDto struct {
+	Status model.OrderStatus `json:"status"`
+}
+
+type OrderResp struct {
+	Id             uint              `json:"id"`
+	TotalAmount    float64           `json:"total_amount"`
+	DiscountAmount float64           `json:"discount_amount"`
+	FinalAmount    float64           `json:"final_amount"`
+	DiscountCode   string            `json:"discount_code"`
+	Status         model.OrderStatus `json:"status"`
+}
+
 type InventoryDetail struct {
 	Id           uint `json:"id"`
 	Quantity     uint `json:"quantity"`
@@ -39,6 +59,31 @@ type InventoryDetail struct {
 type InventoryUpdateDto struct {
 	Quantity     uint `json:"quantity"`
 	ReorderLevel uint `json:"reorder_level"`
+}
+
+type OrderDetails struct {
+	ID             uint               `json:"id"`
+	UserID         uint               `json:"user_id"`
+	AddressID      uint               `json:"address_id"`
+	TotalAmount    float64            `json:"total_amount"`
+	DiscountAmount float64            `json:"discount_amount"`
+	FinalAmount    float64            `json:"final_amount"`
+	DiscountCode   string             `json:"discount_code"`
+	Status         model.OrderStatus  `json:"status"`
+	Items          []*OrderItemDetail `json:"items"`
+}
+
+type OrderItemCreate struct {
+	Quantity uint    `json:"quantity"`
+	Price    float64 `json:"price"`
+	PvId     uint    `json:"pv_id"`
+}
+
+type OrderItemDetail struct {
+	Id       uint    `json:"id"`
+	Quantity uint    `json:"quantity"`
+	Price    float64 `json:"price"`
+	PvId     uint    `json:"pv_id"`
 }
 
 type AddCartItemDto struct {

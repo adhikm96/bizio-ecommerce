@@ -3,6 +3,7 @@ package common
 import (
 	"encoding/json"
 	"log/slog"
+	"math"
 	"net/http"
 	"strconv"
 )
@@ -42,6 +43,10 @@ func ReadReqPayload(writer http.ResponseWriter, request *http.Request, payload i
 		return false
 	}
 	return true
+}
+
+func TwoDigitPrecision(val float64) float64 {
+	return math.Floor(val*100) / 100
 }
 
 func FetchPathVariable(writer http.ResponseWriter, request *http.Request, pathVariable string) (int, error) {

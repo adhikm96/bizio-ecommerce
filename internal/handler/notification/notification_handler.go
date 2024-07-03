@@ -18,6 +18,8 @@ func UpdateReadNotification(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	// TODO : check un-auth access for auth user_id
+
 	err = service.UpdateNotificationAsRead(uint(nID))
 
 	if err != nil {
@@ -40,6 +42,8 @@ func UsersNotificationHandler(writer http.ResponseWriter, request *http.Request)
 		common.HandleErrorRes(writer, map[string]string{"message": "user does not exists with given id"})
 		return
 	}
+
+	// TODO : check un-auth access for user_id
 
 	// fetch user's notifications
 	notifications := service.FetchUserNotifications(uint(userId))
@@ -86,9 +90,14 @@ func validateNotificationCreate(dto common.NotificationCreateDto) map[string]str
 		errMap["user_id"] = "does not exists"
 	}
 
+	// TODO : check valid type for notification
 	// check type
 	if dto.NotificationType == "" {
 		errMap["notification_type"] = "notification_type is required"
+	}
+
+	if dto.Message == "" {
+		errMap["message"] = "message is required"
 	}
 
 	return errMap

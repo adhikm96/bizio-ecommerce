@@ -4,6 +4,7 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/database"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/model"
 	"github.com/shopspring/decimal"
+	"time"
 )
 
 func GetBrand() (*model.Brand, error) {
@@ -40,7 +41,7 @@ func GetVariant() (*model.ProductVariant, error) {
 
 	variant := model.ProductVariant{
 		Sku:       RandomString(10),
-		Price:     decimal.Decimal{},
+		Price:     decimal.New(1, 2),
 		ProductID: product.ID,
 	}
 	res := database.GetDbConn().Create(&variant)
@@ -116,17 +117,82 @@ func GetInventory() (*model.Inventory, error) {
 
 func GetUser() (*model.User, error) {
 	user := model.User{
-		Username:     RandomString(5),
-		Email:        RandomString(5) + "@example.com",
+		Username:     RandomString(10),
+		Email:        RandomString(10) + "@example.com",
 		PasswordHash: "password",
 	}
+	return &user, database.GetDbConn().Create(&user).Error
+}
 
-	res := database.GetDbConn().Create(&user)
+func GetAddress() (*model.Address, error) {
 
-	if res.Error != nil {
-		return nil, res.Error
+	user, err := GetUser()
+	if err != nil {
+		return nil, err
 	}
-	return &user, nil
+
+	address := model.Address{
+		UserID:       user.ID,
+		AddressLine1: "123 Main Street",
+		AddressLine2: "line 2",
+		City:         "Springfield",
+		State:        "IL",
+		Zipcode:      "62701",
+		Country:      "USA",
+	}
+
+	return &address, database.GetDbConn().Create(&address).Error
+}
+
+func GetOutOfStockCart(pv *model.ProductVariant) (*model.Cart, error) {
+
+	user, err := GetUser()
+	if err != nil {
+		return nil, err
+	}
+
+	cart := model.Cart{
+		UserID: user.ID,
+	}
+
+	db := database.GetDbConn()
+
+	if db.Create(&cart).Error != nil {
+		return nil, err
+	}
+
+	if db.Create(&model.Inventory{
+		Quantity:     10,
+		ReorderLevel: 5,
+		VariantID:    pv.ID,
+	}).Error != nil {
+		return nil, err
+	}
+
+	if db.Create(&model.CartItem{
+		Quantity:         20,
+		CartID:           cart.ID,
+		ProductVariantID: pv.ID,
+	}).Error != nil {
+		return nil, err
+	}
+
+	return &cart, nil
+}
+
+func GetDiscount(percentage float64) (*model.Discount, error) {
+	discount := model.Discount{
+		BaseEntity:         model.BaseEntity{},
+		Code:               RandomString(5),
+		Description:        "test discount",
+		DiscountPercentage: percentage,
+		MaxUses:            1,
+		CurrentUses:        0,
+		StartDate:          time.Now(),
+		EndDate:            time.Now().Add(time.Minute * 5),
+	}
+
+	return &discount, database.GetDbConn().Create(&discount).Error
 }
 
 func GetCart() (*model.Cart, error) {

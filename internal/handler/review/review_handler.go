@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func CreateReviewHanlder(w http.ResponseWriter, r *http.Request) {
+func CreateReviewHandler(w http.ResponseWriter, r *http.Request) {
 	productId, err := strconv.Atoi(r.PathValue("product_id"))
 
 	if err != nil {

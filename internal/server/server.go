@@ -6,6 +6,7 @@ import (
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/cart"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/inventory"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/notification"
+	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/order"
 	"github.com/Digital-AIR/bizio-ecommerce/internal/handler/review"
 	"log/slog"
 	"net/http"
@@ -31,8 +32,13 @@ func StartServer() {
 	http.Handle("DELETE /api/v1/cart/{cart_item_id}", JSONHeaderMiddleware(http.HandlerFunc(cart.RemoveCartItemsHandler)))
 
 	//Review api
-	http.Handle("POST /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.CreateReviewHanlder)))
+	http.Handle("POST /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.CreateReviewHandler)))
 	http.Handle("GET /api/v1/products/{product_id}/reviews", JSONHeaderMiddleware(http.HandlerFunc(review.FetchReviewHandler)))
+
+	// order api
+	http.Handle("GET /api/v1/orders/{order_id}", JSONHeaderMiddleware(http.HandlerFunc(order.FetchOrderHandler)))
+	http.Handle("POST /api/v1/orders", JSONHeaderMiddleware(http.HandlerFunc(order.CreateOrderHandler)))
+	http.Handle("PUT /api/v1/orders/{order_id}", JSONHeaderMiddleware(http.HandlerFunc(order.UpdateOrderStatusHandler)))
 
 	http.Handle("GET /api/v1/inventory/{variantId}", JSONHeaderMiddleware(http.HandlerFunc(inventory.FetchInventoryHandler)))
 	http.Handle("PUT /api/v1/admin/inventory/{variantId}", JSONHeaderMiddleware(http.HandlerFunc(inventory.UpdateInventoryHandler)))
